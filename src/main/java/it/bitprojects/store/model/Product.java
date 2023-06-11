@@ -7,11 +7,11 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Order {
-
-	private Integer id;
-	private Integer qty;
-	private BigDecimal price;
+public class Product {
 	
+	private Integer id;
+	private String name;
+	private Category category;
+	private BigDecimal price;
 
 }

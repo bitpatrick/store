@@ -1,10 +1,9 @@
 package it.bitprojects.store.controller;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,13 +15,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.ServletContextAware;
 
-import it.bitprojects.store.dto.Product;
+import it.bitprojects.store.dto.Purchase;
+import it.bitprojects.store.service.StoreService;
 import jakarta.servlet.ServletContext;
+import net.sf.jasperreports.engine.JRException;
 
 @RestController
 @RequestMapping("/api")
 public class MainRestController implements ServletContextAware {
-	
+
+	@Autowired
+	private StoreService storeService;
+
 	private ServletContext servletContext;
 
 	@Override
@@ -30,31 +34,33 @@ public class MainRestController implements ServletContextAware {
 		this.servletContext = servletContext;
 	}
 
-	@GetMapping("/products")
-	@ResponseStatus(HttpStatus.OK)
-	public List<Product> getOrders() {
-		
-		return createOrders();
-	}
-	
-	private List<Product> createOrders() {
-		
-		Product order1 = new Product(1, "Product1", BigDecimal.ONE, "Description1");
-		Product order2 = new Product(1, "Product2", BigDecimal.ONE, "Description2");
-		Product order3 = new Product(1, "Product3", BigDecimal.ONE, "Description3");
-		
-		return Arrays.asList(order1, order2, order3);
-	}
-	
-	@PostMapping("/download")
-	public ResponseEntity<Resource> downloadOrderFile() {
-		
-		String realPath = servletContext.getRealPath("/WEB-INF/reports/orderreport.pdf");
-		Resource resource = new FileSystemResource(realPath);
+	@GetMapping("/generate/report/products-in-stock")
+	public ResponseEntity<Resource> report() {
+
+		String realPath = servletContext.getRealPath("/WEB-INF/reports");
+		Path outputPath = Paths.get(realPath, "products_in_stock.pdf");
+		String imageName = "inventory";
+
+		Resource resource = null;
+		try {
+			resource = storeService.generateReportProductsInStock(imageName, outputPath);
+
+		} catch (JRException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resource);
+		}
+
+		// build response header
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=orderreport.pdf");
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + outputPath.getFileName().toString());
 
 		return ResponseEntity.ok().headers(headers).body(resource);
+
+	}
+
+	@PostMapping("/purchase")
+	@ResponseStatus(HttpStatus.OK)
+	public void purchase(Purchase purchase) {
 
 	}
 
