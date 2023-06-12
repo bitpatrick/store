@@ -6,7 +6,7 @@ import java.util.Map;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.model.Product;
 
-public interface Repository {
+public interface Stock {
 	
 	void checkQty(int idProduct, int qty);
 	

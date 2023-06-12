@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +35,7 @@ public class MainRestController implements ServletContextAware {
 		this.servletContext = servletContext;
 	}
 
-	@GetMapping("/generate/report/products-in-stock")
+	@GetMapping(value = "/products-in-stock", produces = MediaType.APPLICATION_PDF_VALUE)
 	public ResponseEntity<Resource> report() {
 
 		String realPath = servletContext.getRealPath("/WEB-INF/reports");

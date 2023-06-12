@@ -15,19 +15,18 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
 
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.model.Category;
 import it.bitprojects.store.model.Order;
 import it.bitprojects.store.model.Product;
 
-public class Warehouse implements Repository {
+@Repository
+public class Warehouse implements Stock {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
-	@Autowired
-	private SimpleJdbcInsert simpleJdbcInsert;
 
 	@Override
 	public void checkQty(int idProduct, int qty) {
@@ -37,7 +36,9 @@ public class Warehouse implements Repository {
 	@Override
 	public Number createOrder(Map<Product, Integer> products) {
 
-		simpleJdbcInsert.withTableName("orders") // Il nome della tua tabella
+		 // Creazione di SimpleJdbcInsert
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+		.withTableName("orders") // Il nome della tua tabella
 				.usingGeneratedKeyColumns("id"); // Il nome della colonna ID autogenerata
 
 		Map<String, Object> parameters = new HashMap<String, Object>();

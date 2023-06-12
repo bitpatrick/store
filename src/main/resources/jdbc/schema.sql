@@ -3,8 +3,17 @@ CREATE TABLE images (
     blob BLOB
 );
 
+CREATE TABLE products (
+    id INT AUTO_INCREMENT,
+    name VARCHAR(255),
+    category VARCHAR(255),
+    price DECIMAL(10,2),
+    PRIMARY KEY(id)
+);
+
 CREATE TABLE stocks (
     id_product INT PRIMARY KEY,
+    qty INT,
     FOREIGN KEY(id_product) REFERENCES products(id)
 );
 
@@ -15,17 +24,8 @@ CREATE TABLE regulations (
 
 CREATE TABLE orders (
     id INT AUTO_INCREMENT,
-    qty INT,
+    total_qty INT,
     total_price DECIMAL(10,2),
-    PRIMARY KEY(id)
-);
-
-
-CREATE TABLE products (
-    id INT AUTO_INCREMENT,
-    name VARCHAR(255),
-    category VARCHAR(255),
-    price DECIMAL(10,2),
     PRIMARY KEY(id)
 );
 

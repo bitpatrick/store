@@ -23,14 +23,12 @@ public class MyWebConfig implements WebMvcConfigurer {
 		resolver.setSuffix(".jsp");
 		return resolver;
 	}
-	
+
 	@Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-                .allowCredentials(true);
-    }
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**").allowedOrigins("http://localhost:4200")
+				.allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD").allowCredentials(true);
+	}
 
 //	@Bean
 //	public JsonMapper jsonMapper() {
