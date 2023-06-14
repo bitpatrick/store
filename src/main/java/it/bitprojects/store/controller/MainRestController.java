@@ -40,11 +40,11 @@ public class MainRestController implements ServletContextAware {
 
 		String realPath = servletContext.getRealPath("/WEB-INF/reports");
 		Path outputPath = Paths.get(realPath, "products_in_stock.pdf");
-		String imageName = "inventory";
+		String nameImageBackgroud = "office";
 
 		Resource resource = null;
 		try {
-			resource = storeService.generateReportProductsInStock(imageName, outputPath);
+			resource = storeService.generateReportProductsInStock(nameImageBackgroud, outputPath);
 
 		} catch (JRException e) {
 			e.printStackTrace();

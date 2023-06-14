@@ -1,6 +1,7 @@
 package it.bitprojects.store.service;
 
 import java.awt.Image;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,7 +43,7 @@ public class Maximo implements StoreService {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	private static final String MASTER_PATH = "/templates/master.jrxml";
+	private static final String MASTER_PATH = "/templates/cover.jrxml";
 	private static final String PDF_PATH = "/templates/orderreport.jrxml";
 
 	@Override
@@ -68,7 +69,7 @@ public class Maximo implements StoreService {
 	public Resource generateReportProductsInStock(String nameImageBackgroud, Path outputPath) throws JRException {
 
 		// insert images on db
-		insertImageInDb(nameImageBackgroud);
+//		insertImageInDb(nameImageBackgroud);
 
 		// create cover
 		JasperPrint document = createCover(nameImageBackgroud);
@@ -79,8 +80,8 @@ public class Maximo implements StoreService {
 		// join pages
 		join(document, report);
 
-		// output path
-//			new File(realPath).mkdirs(); // Crea la directory se non esiste
+		// Crea la directory se non esiste
+//		outputPath.toFile().mkdirs();
 
 		// export
 		JasperExportManager.exportReportToPdfFile(document, outputPath.toString());
@@ -104,17 +105,17 @@ public class Maximo implements StoreService {
 		return reportPrinted;
 	}
 
-	private JasperPrint createCover(String imageName) throws JRException {
+	private JasperPrint createCover(String imageNameBackground) throws JRException {
 
 		Map<String, Object> parameters = null;
 
 		// check if image is present
-		if (imageName != null || !imageName.trim().isEmpty()) {
+		if (imageNameBackground != null && !imageNameBackground.trim().isEmpty()) {
 
 			parameters = new HashMap<>(1);
 
 			// retrieve image from db
-			byte[] imageBytes = getImageFromDB(imageName);
+			byte[] imageBytes = getImageFromDB(imageNameBackground);
 			ImageIcon icon = new ImageIcon(imageBytes);
 			Image image = icon.getImage();
 
