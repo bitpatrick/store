@@ -16,6 +16,8 @@ public interface Stock {
 	
 	public List<ProductInStock> getAllProductsInStock();
 	
+	public <T> void test(T t);
+	
 	/**
 	 * This method creates an order and returns an id
 	 * 

@@ -12,11 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.ServletContextAware;
 
 import it.bitprojects.store.dto.Purchase;
+import it.bitprojects.store.service.Report;
 import it.bitprojects.store.service.StoreService;
 import jakarta.servlet.ServletContext;
 import net.sf.jasperreports.engine.JRException;
@@ -27,7 +29,7 @@ public class MainRestController implements ServletContextAware {
 
 	@Autowired
 	private StoreService storeService;
-
+	
 	private ServletContext servletContext;
 
 	@Override
@@ -36,15 +38,15 @@ public class MainRestController implements ServletContextAware {
 	}
 
 	@GetMapping(value = "/products-in-stock", produces = MediaType.APPLICATION_PDF_VALUE)
-	public ResponseEntity<Resource> report() {
+	public ResponseEntity<Resource> report(@RequestParam(required = false) String imageBackground) {
 
 		String realPath = servletContext.getRealPath("/WEB-INF/reports");
 		Path outputPath = Paths.get(realPath, "products_in_stock.pdf");
-		String nameImageBackgroud = "office";
+//		String nameImageBackgroud = "office";
 
 		Resource resource = null;
 		try {
-			resource = storeService.generateReportProductsInStock(nameImageBackgroud, outputPath);
+			resource = storeService.generateReportOfProductsInStock(imageBackground, outputPath);
 
 		} catch (JRException e) {
 			e.printStackTrace();

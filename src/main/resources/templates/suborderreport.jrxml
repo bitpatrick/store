@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="suborderreport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0ab542f2-7b28-420f-8dca-25d9ba4c574e">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="qty" class="java.lang.Integer"/>
+	<field name="category" class="java.lang.String"/>
+	<title>
+		<band height="350">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<pieChart>
+				<chart evaluationTime="Report">
+					<reportElement x="0" y="0" width="555" height="350" uuid="59958cbc-9c3b-448c-9451-5b7d9555e8e6"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{category}]]></keyExpression>
+					<valueExpression><![CDATA[$F{qty}]]></valueExpression>
+					<labelExpression><![CDATA[$F{qty}.toString()]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+		</band>
+	</title>
+</jasperReport>

@@ -111,15 +111,12 @@ public class Warehouse implements Stock {
 			@Override
 			public void processRow(ResultSet rs) throws SQLException {
 				// retrieve info product
-				int id = rs.getInt("id");
-				String name = rs.getString("name");
-				Category category = Category.valueOf(rs.getString("category"));
-				BigDecimal price = rs.getBigDecimal("price");
+				String category = Category.valueOf(rs.getString("category")).toString();
 
 				// retrieve qty product in warehouse
 				int qty = rs.getInt("qty");
 
-				ProductInStock product = new ProductInStock(id, name, category, price, qty);
+				ProductInStock product = new ProductInStock(category, qty);
 
 				// add product to list
 				products.add(product);
@@ -127,6 +124,12 @@ public class Warehouse implements Stock {
 		});
 
 		return products;
+	}
+
+	@Override
+	public <T> void test(T t) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

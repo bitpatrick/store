@@ -24,6 +24,7 @@
 
 		<!--
 		https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
+		<!-- fare report -->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>

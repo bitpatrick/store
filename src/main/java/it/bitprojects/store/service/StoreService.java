@@ -10,7 +10,7 @@ import net.sf.jasperreports.engine.JRException;
 public interface StoreService {
 
 	public Number purchase(Purchase purchase);
-
-	public Resource generateReportProductsInStock(String nameImageBackgroud, Path outputPath) throws JRException;
+	
+	public Resource generateReportOfProductsInStock(String backgroundImage, Path output) throws JRException;
 
 }
