@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.ServletContextAware;
 
 import it.bitprojects.store.dto.Purchase;
-import it.bitprojects.store.service.Report;
 import it.bitprojects.store.service.StoreService;
 import jakarta.servlet.ServletContext;
 import net.sf.jasperreports.engine.JRException;
@@ -41,7 +40,7 @@ public class MainRestController implements ServletContextAware {
 	public ResponseEntity<Resource> report(@RequestParam(required = false) String imageBackground) {
 
 		String realPath = servletContext.getRealPath("/WEB-INF/reports");
-		Path outputPath = Paths.get(realPath, "products_in_stock.pdf");
+		Path outputPath = Paths.get(realPath);
 //		String nameImageBackgroud = "office";
 
 		Resource resource = null;

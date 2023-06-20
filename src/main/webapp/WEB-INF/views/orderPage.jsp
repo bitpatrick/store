@@ -8,7 +8,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<form action="api/download" method="post">
+	<form action="api/products-in-stock" method="get">
 		<input type="submit" value="Donwload Order PDF">
 	</form>
 </body>

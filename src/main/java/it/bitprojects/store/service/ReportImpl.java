@@ -1,6 +1,7 @@
 package it.bitprojects.store.service;
 
 import java.awt.Image;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JREmptyDataSource;
@@ -27,8 +29,9 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 
+@Component
 public class ReportImpl implements Report {
-	
+
 	private JasperPrint cover = null;
 
 	private static final String MASTER_PATH = "/templates/cover.jrxml";
@@ -41,26 +44,34 @@ public class ReportImpl implements Report {
 	@Override
 	public Resource generateReportProductsInStock(String nameImageBackgroud, Path outputPath, JRDataSource reportData,
 			JRDataSource subReportData) throws JRException {
-		
-		// cover 
+
+		// cover
 		createCover(nameImageBackgroud);
 
 		// create report
 		JasperPrint report = createReport(reportData, subReportData);
 
 		// check if cover is present
-		if ( cover != null ) {
+		if (cover != null) {
 			// join pages
 			join(cover, report);
 		}
 
 		// Crea la directory se non esiste
-//		outputPath.toFile().mkdirs();
+		File dir = outputPath.toFile();
+		if (!dir.exists()) {
+		    boolean success = dir.mkdirs();
+		    if (!success) {
+		        throw new RuntimeException("Failed to create directory: " + dir.getAbsolutePath());
+		    }
+		}
+		
+		File file = new File(outputPath.toString() + "\\products_in_stock.pdf");
 
 		// export
-		JasperExportManager.exportReportToPdfFile((cover != null) ? cover : report, outputPath.toString());
+		JasperExportManager.exportReportToPdfFile((cover != null) ? cover : report, file.getAbsolutePath());
 
-		return new FileSystemResource(outputPath);
+		return new FileSystemResource(file);
 	}
 
 	private JasperPrint createReport(JRDataSource reportData, JRDataSource subReportData) throws JRException {
@@ -83,21 +94,19 @@ public class ReportImpl implements Report {
 
 	public void createCover(String imageNameBackground) throws JRException {
 
-		Map<String, Object> parameters = null;
-
-		// check if image is present
-		if (imageNameBackground != null && !imageNameBackground.trim().isEmpty()) {
-
-			parameters = new HashMap<>(1);
-
-			// retrieve image from db
-			byte[] imageBytes = getImageFromDB(imageNameBackground);
-			ImageIcon icon = new ImageIcon(imageBytes);
-			Image image = icon.getImage();
-
-			// build parameter image
-			parameters.put("image", image);
+		if (imageNameBackground == null || imageNameBackground.isBlank()) {
+			return;
 		}
+
+		Map<String, Object> parameters = new HashMap<>(1);
+
+		// retrieve image from db
+		byte[] imageBytes = getImageFromDB(imageNameBackground);
+		ImageIcon icon = new ImageIcon(imageBytes);
+		Image image = icon.getImage();
+
+		// build parameter image
+		parameters.put("image", image);
 
 		// build cover
 		InputStream coverInputStream = this.getClass().getResourceAsStream(MASTER_PATH);
@@ -130,7 +139,7 @@ public class ReportImpl implements Report {
 					new Object[] { imageName }, byte[].class);
 			return imageBytes;
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
 			return null;
 		}
@@ -154,5 +163,5 @@ public class ReportImpl implements Report {
 			cover.addPage(reportPage);
 		}
 	}
-	
+
 }
