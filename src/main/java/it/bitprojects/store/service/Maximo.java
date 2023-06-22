@@ -1,22 +1,13 @@
 package it.bitprojects.store.service;
 
-import java.awt.Image;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.ImageIcon;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.ProductInStock;
@@ -24,14 +15,7 @@ import it.bitprojects.store.dto.Purchase;
 import it.bitprojects.store.model.Product;
 import it.bitprojects.store.repository.Warehouse;
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRPrintPage;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
@@ -42,7 +26,7 @@ public class Maximo implements StoreService {
 
 	@Autowired
 	private Report report;
-	
+
 	@Override
 	public Number purchase(Purchase purchase) {
 
@@ -68,15 +52,11 @@ public class Maximo implements StoreService {
 		// datas
 		List<Product> products = warehouse.getAll(Product.class);
 		List<ProductInStock> productsInStock = warehouse.getAllProductsInStock();
-		
+
 		JRDataSource reportData = new JRBeanCollectionDataSource(products);
 		JRDataSource subReportData = new JRBeanCollectionDataSource(productsInStock);
-		
+
 		return report.generateReportProductsInStock(backgroundImage, output, reportData, subReportData);
 	}
-	
-	
-
-	
 
 }
