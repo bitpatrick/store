@@ -33,10 +33,13 @@ public class MyWebConfig implements WebMvcConfigurer {
 				.allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD").allowCredentials(true);
 	}
 
+	/**
+	 * LOGIN PAGE
+	 */
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		ViewControllerRegistration r = registry.addViewController("/index");
-		r.setViewName("index");
+		ViewControllerRegistration r = registry.addViewController("/login");
+		r.setViewName("login");
 		r.setStatusCode(HttpStatus.GONE);
 	}
 
