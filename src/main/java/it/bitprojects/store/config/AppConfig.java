@@ -15,6 +15,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 @ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
 		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
+
+/*
+ * Valerio
+ */
 public class AppConfig {
 
 	/**
