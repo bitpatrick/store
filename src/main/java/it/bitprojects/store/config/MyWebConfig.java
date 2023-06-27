@@ -40,7 +40,7 @@ public class MyWebConfig implements WebMvcConfigurer {
 	public void addViewControllers(ViewControllerRegistry registry) {
 		ViewControllerRegistration r = registry.addViewController("/login");
 		r.setViewName("login");
-		r.setStatusCode(HttpStatus.GONE);
+		r.setStatusCode(HttpStatus.OK);
 	}
 
 //	@Bean

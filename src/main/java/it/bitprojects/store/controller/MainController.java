@@ -14,8 +14,14 @@ public class MainController {
 
 	@GetMapping("/home")
 	public String home() {
-
+		
 		return "home";
 	}
+	
+	@GetMapping("/purchase")
+    public String purchase() {
+		
+        return "purchase";
+    }
 
 }
