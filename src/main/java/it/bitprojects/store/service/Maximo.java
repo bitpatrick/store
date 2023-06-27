@@ -61,6 +61,8 @@ public class Maximo implements StoreService {
 
 	public void hello2() {
 		System.out.println("hello2");
+	public void hello3() {
+		System.out.println("hello");
 	}
 
 }
