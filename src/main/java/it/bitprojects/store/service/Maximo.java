@@ -59,7 +59,7 @@ public class Maximo implements StoreService {
 		return report.generateReportProductsInStock(backgroundImage, output, reportData, subReportData);
 	}
 
-	public void hello() {
+	public void hello3() {
 		System.out.println("hello");
 	}
 
