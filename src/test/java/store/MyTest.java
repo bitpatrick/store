@@ -24,7 +24,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import it.bitprojects.store.config.MyWebConfig;
-import it.bitprojects.store.dto.Product;
+import it.bitprojects.store.dto.ProductDto;
 
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
@@ -52,7 +52,7 @@ class MyTest {
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 
 		// Converti la risposta JSON in una lista
-		List<Product> products = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<Product>>() {
+		List<ProductDto> products = objectMapper.readValue(response.getContentAsString(), new TypeReference<List<ProductDto>>() {
 		});
 
 		// Verifica che la lista contenga un totale di elementi

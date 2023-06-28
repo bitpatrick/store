@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -22,7 +23,7 @@ public class MyWebConfig implements WebMvcConfigurer {
 	public ViewResolver viewResolver() {
 		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
 		resolver.setViewClass(JstlView.class);
-		resolver.setPrefix("/WEB-INF/views/");
+		resolver.setPrefix("/views/jsp/");
 		resolver.setSuffix(".jsp");
 		return resolver;
 	}
@@ -42,6 +43,12 @@ public class MyWebConfig implements WebMvcConfigurer {
 		r.setViewName("login");
 		r.setStatusCode(HttpStatus.OK);
 	}
+	
+	@Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/static/js/**").addResourceLocations("/static/js/");
+        registry.addResourceHandler("/static/views/jsp/**").addResourceLocations("/static/views/jsp");
+    }
 
 //	@Bean
 //	public JsonMapper jsonMapper() {

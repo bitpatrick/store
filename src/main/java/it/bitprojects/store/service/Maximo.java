@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.Purchase;
 import it.bitprojects.store.model.Product;
@@ -57,6 +58,12 @@ public class Maximo implements StoreService {
 		JRDataSource subReportData = new JRBeanCollectionDataSource(productsInStock);
 
 		return report.generateReportProductsInStock(backgroundImage, output, reportData, subReportData);
+	}
+
+	@Override
+	public List<ProductDto> getAllProducts() {
+
+		return warehouse.getAll(Product.class).stream().map(p -> new ProductDto(p.getName(), p.getCategory(), p.getPrice())).toList();
 	}
 
 }

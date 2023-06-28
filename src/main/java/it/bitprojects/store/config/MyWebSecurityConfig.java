@@ -73,8 +73,7 @@ public class MyWebSecurityConfig {
 	    .authorizeHttpRequests(
 	        
 	        t -> 
-	        t.requestMatchers("/WEB-INF/**").permitAll()
-	        .requestMatchers("/src/main/resources/**").permitAll()
+	        t.requestMatchers("/views/jsp/login.jsp","/views/jsp/lightSwitch.jsp","/static/**").permitAll()
 	        .requestMatchers("/h2**").hasRole("ADMIN")
 	        .anyRequest().authenticated()
 	    
