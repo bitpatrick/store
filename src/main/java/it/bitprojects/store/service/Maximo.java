@@ -11,8 +11,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.ProductDto;
+import it.bitprojects.store.dto.ProductInCart;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.Purchase;
+import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.model.Product;
 import it.bitprojects.store.repository.Warehouse;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -63,7 +65,25 @@ public class Maximo implements StoreService {
 	@Override
 	public List<ProductDto> getAllProducts() {
 
-		return warehouse.getAll(Product.class).stream().map(p -> new ProductDto(p.getName(), p.getCategory(), p.getPrice())).toList();
+		return warehouse.getAll(Product.class).stream().map(p -> new ProductDto(p.getId(), p.getName(), p.getCategory(), p.getPrice())).toList();
 	}
+
+	@Override
+	public void addProductToCart(int idProduct, int qty, Cart cart) {
+
+		// verifica disponibilità prodotto
+		this.warehouse.checkQty(idProduct, qty);
+		
+		// recupera protoddo
+		Product product = this.warehouse.getById(idProduct, Product.class);
+		
+		// crea dto
+		ProductDto productDto = new ProductDto(idProduct, product.getName(), product.getCategory(), product.getPrice());
+		ProductInCart productInCart = new ProductInCart(productDto, qty);
+		
+		// inserisci prodotto e qta desiderata nel carrello
+		cart.getProducts().add(productInCart);
+	}
+
 
 }

@@ -3,7 +3,9 @@ package it.bitprojects.store.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -13,6 +15,9 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+
+import it.bitprojects.store.model.Cart;
+import jakarta.servlet.http.HttpServletRequest;
 
 @EnableWebMvc
 @Configuration
@@ -47,8 +52,15 @@ public class MyWebConfig implements WebMvcConfigurer {
 	@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/js/**").addResourceLocations("/static/js/");
+        registry.addResourceHandler("/static/img/**").addResourceLocations("/static/img/");
         registry.addResourceHandler("/static/views/jsp/**").addResourceLocations("/static/views/jsp");
     }
+	
+	@Bean
+	@Scope(WebApplicationContext.SCOPE_SESSION)
+	public Cart cart(){
+	      return new Cart();
+	}
 
 //	@Bean
 //	public JsonMapper jsonMapper() {

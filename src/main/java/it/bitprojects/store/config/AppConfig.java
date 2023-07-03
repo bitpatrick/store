@@ -46,5 +46,7 @@ public class AppConfig {
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
 		return new DataSourceTransactionManager(dataSource);
 	}
+	
+
 
 }

@@ -17,7 +17,7 @@
 	</div>
 	<div class="container p-5 my-5 overflow-hidden text-center">
 		<form method="post" action="${pageContext.request.contextPath}/login">
-			<div class="row gy-5 align-items-center">
+			<div class="row gy-1 align-items-center">
 				<div class="col-6">
 					<div class="p-3">Username:</div>
 				</div>
@@ -40,15 +40,12 @@
 				</div>
 				<div class="col-12">
 					<div class="form-check">
-						<input class="form-check-input" type="checkbox"
-							id="flexCheckDefault" name="remember-me"> <label
-							class="form-check-label" for="flexCheckDefault">Remember
-							me</label>
+						<input class="form-check-input" type="checkbox" id="flexCheckDefault" name="remember-me">
+						<label class="form-check-label" for="flexCheckDefault">Remember me</label>
 					</div>
 				</div>
 				<div class="col-12">
-					<button type="submit" class="btn btn-primary mb-3">
-						Confirm identity</button>
+					<button type="submit" class="btn btn-primary mb-3">Confirm identity</button>
 				</div>
 			</div>
 		</form>

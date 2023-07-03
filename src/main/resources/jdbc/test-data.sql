@@ -1,7 +1,7 @@
-INSERT INTO products (name, category, price) VALUES ('iPhone', 'TELEPHONY', 10.99);
-INSERT INTO products (name, category, price) VALUES ('LG 2000', 'TV', 15.99);
-INSERT INTO products (name, category, price) VALUES ('Folletto', 'HOUSEHOLD_APPLIANCE', 20.99);
-INSERT INTO products (name, category, price) VALUES ('SAMSUNG', 'TELEPHONY', 39.99);
+INSERT INTO products (name, category, price) VALUES ('iphone', 'TELEPHONY', 10.99);
+INSERT INTO products (name, category, price) VALUES ('lg-tv', 'TV', 15.99);
+INSERT INTO products (name, category, price) VALUES ('folletto', 'HOUSEHOLD_APPLIANCE', 20.99);
+INSERT INTO products (name, category, price) VALUES ('samsung-s9', 'TELEPHONY', 39.99);
 
 INSERT INTO stocks (id_product, qty) VALUES (1, 5);
 INSERT INTO stocks (id_product, qty) VALUES (2, 7);
