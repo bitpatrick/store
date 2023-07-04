@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import it.bitprojects.store.dto.ProductInStock;
+import it.bitprojects.store.exceptions.ProductNotAvailableException;
 import it.bitprojects.store.model.Category;
 import it.bitprojects.store.model.Order;
 import it.bitprojects.store.model.Product;
