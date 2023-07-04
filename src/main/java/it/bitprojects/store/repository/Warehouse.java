@@ -30,15 +30,27 @@ public class Warehouse implements Stock {
 
 	@Override
 	public void checkQty(int idProduct, int qty) {
-		// TODO
+
+		/*
+		 * fare check sulla quantita del prodotto
+		 */
+
+		String sqlScript = "SELECT QTY FROM STOCKS WHERE ID_PRODUCT =" + idProduct + " AND QTY >= " + qty;
+
+		try {
+			jdbcTemplate.queryForObject(sqlScript, Integer.class);
+		} catch (Exception e) {
+			throw new ProductNotAvailableException();
+		}
+
 	}
 
 	@Override
 	public Number createOrder(Map<Product, Integer> products) {
 
-		 // Creazione di SimpleJdbcInsert
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-		.withTableName("orders") // Il nome della tua tabella
+		// Creazione di SimpleJdbcInsert
+		SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("orders") // Il nome della
+																										// tua tabella
 				.usingGeneratedKeyColumns("id"); // Il nome della colonna ID autogenerata
 
 		Map<String, Object> parameters = new HashMap<String, Object>();
@@ -129,7 +141,7 @@ public class Warehouse implements Stock {
 	@Override
 	public <T> void test(T t) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
