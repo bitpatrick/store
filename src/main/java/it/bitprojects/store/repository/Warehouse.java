@@ -30,7 +30,7 @@ public class Warehouse implements Stock {
 
 	@Override
 	public void checkQty(int idProduct, int qty) {
-
+		// TODO
 	}
 
 	@Override
