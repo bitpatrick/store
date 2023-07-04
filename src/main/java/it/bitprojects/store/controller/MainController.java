@@ -1,5 +1,6 @@
 package it.bitprojects.store.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +27,10 @@ public class MainController {
 	@Autowired
 	private StoreService store;
 
-//	@GetMapping("/login")
-//	public String login() {
-//
-//		return "login";
-//	}
-
-	/**
-	 * HOME
-	 * 
-	 * @param model
-	 * @return
-	 */
 	@GetMapping("/home")
 	public String home(Model model) {
+
+		model.getAttribute("cart");
 
 		// recupero prodotti tramite il service
 		List<ProductDto> products = store.getAllProducts();
@@ -58,26 +49,36 @@ public class MainController {
 	}
 
 	@PostMapping(value = "/cart-addProduct/{idProduct}")
-	public String addProduct(@PathVariable("idProduct") Integer idProduct, @RequestBody MultiValueMap<String, String> formParams) {
+	public String addProduct(
+			@PathVariable("idProduct") Integer idProduct,
+			@RequestBody MultiValueMap<String, String> formParams, 
+			Model model
+			) {
 
-		String qty = formParams.getFirst("quantity");
-
-		// convert strings to integers
-		int qtyInt = Integer.parseInt(qty);
+		int qty = Integer.parseInt(formParams.getFirst("quantity"));
 
 		// recupero carrello
 		Cart cart = this.cartProvider.get();
+		
+		LocalDate date = (LocalDate) model.getAttribute("date");
+		System.out.println("data aggiunta carello: " + date);
 
-		// verificare giacenza magazzino
-		this.store.addProductToCart(idProduct, qtyInt, cart);
+		// aggiungi il prodotto al carrello con la relativa quantità
+		this.store.addProductToCart(idProduct, qty, cart);
 
-		// restituisci la lista
+		// ritorna alla home
 		return "redirect:/home";
 	}
 
-	@ModelAttribute("cart")
-	public Cart getCart() {
-		return cartProvider.get();
+	/**
+	 * Questo metodo viene richiamato prima che venga eseguito qualsiasi handler
+	 * method della classe
+	 * 
+	 * @return
+	 */
+	@ModelAttribute("date")
+	public LocalDate getDate() {
+		return LocalDate.now();
 	}
 
 }
