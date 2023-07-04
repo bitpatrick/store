@@ -75,7 +75,7 @@ public class MyWebSecurityConfig {
 	        t -> 
 	        t.requestMatchers("/views/jsp/login.jsp","/views/jsp/lightSwitch.jsp","/static/**").permitAll()
 	        .requestMatchers("/h2**").hasRole("ADMIN")
-	        .anyRequest().authenticated()
+	        .anyRequest().permitAll()
 	    
 	    )
 	    

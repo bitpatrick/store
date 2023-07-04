@@ -62,12 +62,12 @@
 										<!-- CART/ -->
 										
 										<!-- /QTY -->
-<div class="form-floating form-outline">
-    <input type="hidden" name="productId" value="${product.id()}">
-    <input type="number" class="form-control quantity-input" id="typeNumber" placeholder="Number" aria-describedby="basic-addon1"  min="0"/>
-    <label for="typeNumber">Number input</label>
-</div>
-<!-- QTY/ -->
+										<div class="form-floating form-outline">
+										    <input type="hidden" name="productId" value="${product.id()}">
+										    <input type="number" class="form-control quantity-input" id="typeNumber" placeholder="Number" aria-describedby="basic-addon1"  min="0"/>
+										    <label for="typeNumber">Number input</label>
+										</div>
+										<!-- QTY/ -->
 
 									  	
 									</div>

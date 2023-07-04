@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.model.Cart;
@@ -55,18 +57,23 @@ public class MainController {
 		return "purchase";
 	}
 
-	@PostMapping(value = "/addProduct", produces = MediaType.TEXT_HTML_VALUE)
-	public String addProduct(int idProduct, int qty) {
+	@PostMapping(value = "/addProduct", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public String addProduct(@RequestBody MultiValueMap<String, String> formParams) {
+		
+		String idProduct = formParams.getFirst("idProduct");
+	    String qty = formParams.getFirst("qty");
 
-		// recupero carrello
+	    // convert strings to integers
+	    int idProductInt = Integer.parseInt(idProduct);
+	    int qtyInt = Integer.parseInt(qty);
 
-		Cart cart = this.cartProvider.get();
+	    // recupero carrello
+	    Cart cart = this.cartProvider.get();
+	    
+	    //verificare giacenza magazzino
+	    this.store.addProductToCart(idProductInt, qtyInt, cart);
 
-		/*
-		 * verificare giacenza magazzino
-		 */
-		this.store.addProductToCart(idProduct, qty, cart);
-
+	    // restituisci la lista
 		return "home";
 	}
 
