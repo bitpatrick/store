@@ -1,4 +1,4 @@
-
+<%@include file="bootstrap5linksAndMetas.jsp"%>
 
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
 	<div class="container-fluid">
@@ -13,7 +13,7 @@
 				<li class="nav-item"><a class="nav-link active"
 					aria-current="page" href="#">Home</a></li>
 				<li class="nav-item"><a class="nav-link" href="${pageContext.servletContext.contextPath}/purchase">Purchase</a></li>
-				<li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
+				<li class="nav-item"></li>
 				<li class="nav-item"><a class="nav-link disabled">Disabled</a>
 				</li>
 			</ul>
@@ -23,5 +23,11 @@
 		
 	</div>
 </nav>
+
+<%@include file="bootstrap5scripts.jsp"%>
+
+
+
+
 
 

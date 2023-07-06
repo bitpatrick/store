@@ -1,9 +1,8 @@
-<%@include file="libs.jsp"%>
+<%@include file="customTags.jsp"%>
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<%@include file="bootstrap5linksAndMetas.jsp"%>
 <title>Login page</title>
 </head>
 <body>
@@ -54,5 +53,5 @@
 </html>
 
 
-
+<%@include file="bootstrap5scripts.jsp"%>
 

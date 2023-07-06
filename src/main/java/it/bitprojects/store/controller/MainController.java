@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import it.bitprojects.store.dto.ProductDto;
+import it.bitprojects.store.dto.ProductInCart;
 import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.service.StoreService;
 import jakarta.inject.Provider;
@@ -29,14 +30,19 @@ public class MainController {
 
 	@GetMapping("/home")
 	public String home(Model model) {
-
-		model.getAttribute("cart");
+		
+		// recupero carrello
+		Cart cart = this.cartProvider.get();
 
 		// recupero prodotti tramite il service
 		List<ProductDto> products = store.getAllProducts();
+		
+		// recupero prodotti nel carrello dell'utente
+		List<ProductInCart> productsInCart = cart.getProducts();
 
 		// aggiungo i prodotti al modello
 		model.addAttribute("products", products);
+		model.addAttribute("cart", productsInCart);
 
 		// il modello verrà reindirizzato alla view
 		return "home";
