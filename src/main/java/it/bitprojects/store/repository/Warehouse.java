@@ -30,23 +30,6 @@ public class Warehouse implements Stock {
 	private JdbcTemplate jdbcTemplate;
 
 	@Override
-	public void checkQty(int idProduct, int qty) {
-
-		/*
-		 * fare check sulla quantita del prodotto
-		 */
-
-		String sqlScript = "SELECT QTY FROM STOCKS WHERE ID_PRODUCT =" + idProduct + " AND QTY >= " + qty;
-
-		try {
-			jdbcTemplate.queryForObject(sqlScript, Integer.class);
-		} catch (Exception e) {
-			throw new ProductNotAvailableException();
-		}
-
-	}
-
-	@Override
 	public Number createOrder(Map<Product, Integer> products) {
 
 		// Creazione di SimpleJdbcInsert
@@ -139,10 +122,30 @@ public class Warehouse implements Stock {
 		return products;
 	}
 
-	@Override
-	public <T> void test(T t) {
-		// TODO Auto-generated method stub
+	public void updateQty(int idProduct, int qty) {
 
+		String selectSql = "SELECT qty FROM stocks WHERE id_product = " + idProduct + " AND qty >= " + qty;
+
+		int qtyInStock;
+		try {
+
+			qtyInStock = jdbcTemplate.queryForObject(selectSql, Integer.class);
+
+		} catch (Exception e) {
+
+			qtyInStock = 0;
+		}
+
+		int newQty = qtyInStock - qty;
+
+		if (newQty < 0) {
+
+			throw new ProductNotAvailableException();
+		}
+
+		String updateSql = "UPDATE stocks SET qty = ? WHERE id_product = ?";
+
+		jdbcTemplate.update(updateSql, newQty, idProduct);
 	}
 
 }

@@ -11,7 +11,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.ProductDto;
-import it.bitprojects.store.dto.ProductInCart;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.Purchase;
 import it.bitprojects.store.model.Cart;
@@ -39,7 +38,7 @@ public class Maximo implements StoreService {
 			int idProduct = entry.getKey();
 			int qtyPurchase = entry.getValue();
 
-			warehouse.checkQty(idProduct, qtyPurchase);
+//			warehouse.checkQty(idProduct, qtyPurchase);
 
 			Product product = warehouse.getById(idProduct, Product.class);
 
@@ -71,19 +70,17 @@ public class Maximo implements StoreService {
 	@Override
 	public void addProductToCart(int idProduct, int qty, Cart cart) {
 
-		// verifica disponibilità prodotto
-		this.warehouse.checkQty(idProduct, qty);
+		// decurta qta prodotto dal magazzino
+		this.warehouse.updateQty(idProduct, qty);
 		
-		// recupera protoddo
+		// recupera scheda prodotto
 		Product product = this.warehouse.getById(idProduct, Product.class);
 		
-		// crea dto
+		// crea dto prodotto
 		ProductDto productDto = new ProductDto(idProduct, product.getName(), product.getCategory(), product.getPrice());
-		ProductInCart productInCart = new ProductInCart(productDto, qty);
 		
-		// inserisci prodotto e qta desiderata nel carrello
-		cart.getProducts().add(productInCart);
+		// inserisco il prodotto nel carrello
+		cart.getProducts().compute(productDto, (p, qtyInCart) -> qtyInCart == null ? qty : qtyInCart + qty);
 	}
-
 
 }

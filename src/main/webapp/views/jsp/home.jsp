@@ -37,13 +37,16 @@
 				    </tr>
 				  </thead>
 				  <tbody>
-				  <c:forEach var="productInCart" items="${cart}" varStatus="status">
-				    <tr>
-				    	<input type="hidden" class="product-id" value="${productInCart.product().id()}">
+				  <c:forEach var="productInCart" items="${productsInCart}" varStatus="status">
+				    
+				    <tr class="product-row-${productInCart.key.id()}">
+
+				    	<input type="hidden" class="product-id" value="${productInCart.key.id()}">
 				    	<th scope="row">${status.count}</th>
-				    	<td>${productInCart.product().name()}</td>
-				    	<td class="product-qty-${productInCart.product().id()}">${productInCart.qty()}</td>
-				    	<c:set var="total" value="${productInCart.qty() * productInCart.product().price()}"/>
+				    	<td>${productInCart.key.name()}</td>
+				    	<td class="product-qty">${productInCart.value}</td>
+
+				    	<c:set var="total" value="${productInCart.value * productInCart.key.price()}"/>
       					<td><c:out value="${total}" /></td>
       					<td>
       						<div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
@@ -118,32 +121,37 @@
 </html>
 
 <%@include file="bootstrap5scripts.jsp"%>
+<%@include file="jQuery.jsp"%>
 
 <script>
-$(document).ready(function(){
-    $('.plus-button, .minus-button').click(function(){
-        var productID = $(this).siblings('.product-id').val();
-        var isIncrement = $(this).hasClass('plus-button');  // verifica se l'azione è un incremento o un decremento
-
-        $.ajax({
-            type: 'POST',
-            url: '${pageContext.request.contextPath}/cart-addProduct/${product.id()}',
-            data: { productID: productID },  
-            success: function(response) {
-                if (response.canAddProduct) {
-                    // seleziona l'elemento DOM della quantità del prodotto
-                    var qtyElement = $('.product-qty-' + productID);
-                    var currentQty = parseInt(qtyElement.text());
-                    
-                    // incrementa o decrementa la quantità del prodotto nel DOM
-                    qtyElement.text(isIncrement ? currentQty + 1 : currentQty - 1);
-                    
-                    // riapri la modale
-                    $('#exampleModal').modal('show');
-                }
-            }
-        });
-    });
-});
+	$(document).ready(function(){
+	    
+		$('.btn-outline-primary').click(function(){
+	        
+	    	var productID = $(this).closest('tr').find('.product-id').val();
+	        var isIncrement = $(this).text() === "+";  // verifica se l'azione è un incremento o un decremento
+	
+	        var url = isIncrement ? '${pageContext.request.contextPath}/cart-addProduct/' + productID : '${pageContext.request.contextPath}/cart-removeProduct/${product.id()}';
+	
+	        $.ajax({
+	            type: 'POST',
+	            url: url,
+	            contentType: 'application/json',
+	            success: function(response) {
+	                    
+	                	// seleziona l'elemento DOM della quantità del prodotto
+	                    var qtyElement = $('.product-row-' + productID + ' .product-qty');
+	                    var currentQty = parseInt(qtyElement.text());
+	                    
+	                    // incrementa o decrementa la quantità del prodotto nel DOM
+	                    qtyElement.text(isIncrement ? currentQty + 1 : currentQty - 1);
+	                    
+	                    // riapri la modale
+	                    $('#exampleModal').modal('show');
+	            }
+	        });
+	    });
+	});
 </script>
+
 
