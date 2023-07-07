@@ -22,6 +22,13 @@
 		<jsp:include page="lightSwitch.jsp" />
 		
 	</div>
+	
+	<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+  Launch demo modal
+</button>
+
+
 </nav>
 
 <%@include file="bootstrap5scripts.jsp"%>

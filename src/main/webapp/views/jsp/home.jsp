@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@include file="customTags.jsp"%>
 <!DOCTYPE html>
 <html>
@@ -18,40 +17,60 @@
 <body>
 	<jsp:include page="navbar.jsp" />
 	
-	<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <c:forEach var="productInCart" items="${cart}">
-    <p>Product Name: ${productInCart.product().name()}</p>
-</c:forEach>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
+	<!-- Modal -->
+	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	    		<table class="table">
+				  <thead>
+				    <tr>
+				      <th scope="col">#</th>
+				      <th scope="col">Name</th>
+				      <th scope="col">Qty</th>
+				      <th scope="col">Price</th>
+				      <th scope="col">#</th>
+				    </tr>
+				  </thead>
+				  <tbody>
+				  <c:forEach var="productInCart" items="${cart}" varStatus="status">
+				    <tr>
+				    	<input type="hidden" class="product-id" value="${productInCart.product().id()}">
+				    	<th scope="row">${status.count}</th>
+				    	<td>${productInCart.product().name()}</td>
+				    	<td class="product-qty-${productInCart.product().id()}">${productInCart.qty()}</td>
+				    	<c:set var="total" value="${productInCart.qty() * productInCart.product().price()}"/>
+      					<td><c:out value="${total}" /></td>
+      					<td>
+      						<div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+  								<button type="button" class="btn btn-outline-primary">+</button>
+ 								<button type="button" class="btn btn-outline-primary">-</button>
+							</div>
+						</td>
+				    </tr>
+				   </c:forEach>
+				  </tbody>
+				</table>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-primary">Save changes</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 	
-
-
 	<div class="container mt-5">
 		<div class="row">
 			<c:forEach var="product" items="${products}">
 				<div class="col-lg-4 col-md-6 mb-4">
 					<div class="card">
-						<img class="card-img-top product-image"
+						<img 
+							class="card-img-top product-image"
 							src="${pageContext.request.contextPath}/static/img/${product.name()}.jpg"
 							alt="#">
 						<div class="card-body">
@@ -68,34 +87,63 @@
 									<div class="input-group mb-3">
 										<span class="input-group-text" id="basic-addon1">
 											<button type="submit" class="btn btn-primary">
-												<svg xmlns="http://www.w3.org/2000/svg" width="16"
-													height="16" fill="currentColor" class="bi bi-cart-plus"
+												<svg 
+													xmlns="http://www.w3.org/2000/svg" 
+													width="16"
+													height="16" fill="currentColor" 
+													class="bi bi-cart-plus"
 													viewBox="0 0 16 16">
-						<path
-														d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z" />
-						<path
-														d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-					</svg>
+														<path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z" />
+														<path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+												</svg>
 											</button>
-										</span> <input type="text" name="quantity" class="form-control"
-											placeholder="Qty" aria-label="Qty"
+										</span>
+										<input 
+											type="text" 
+											name="quantity" 
+											class="form-control"
+											placeholder="Qty" 
+											aria-label="Qty"
 											aria-describedby="basic-addon1">
 									</div>
 								</div>
 							</form>
-
 						</div>
 					</div>
 				</div>
 			</c:forEach>
 		</div>
 	</div>
-	
-	
 </body>
 </html>
 
-
-
-
 <%@include file="bootstrap5scripts.jsp"%>
+
+<script>
+$(document).ready(function(){
+    $('.plus-button, .minus-button').click(function(){
+        var productID = $(this).siblings('.product-id').val();
+        var isIncrement = $(this).hasClass('plus-button');  // verifica se l'azione è un incremento o un decremento
+
+        $.ajax({
+            type: 'POST',
+            url: '${pageContext.request.contextPath}/cart-addProduct/${product.id()}',
+            data: { productID: productID },  
+            success: function(response) {
+                if (response.canAddProduct) {
+                    // seleziona l'elemento DOM della quantità del prodotto
+                    var qtyElement = $('.product-qty-' + productID);
+                    var currentQty = parseInt(qtyElement.text());
+                    
+                    // incrementa o decrementa la quantità del prodotto nel DOM
+                    qtyElement.text(isIncrement ? currentQty + 1 : currentQty - 1);
+                    
+                    // riapri la modale
+                    $('#exampleModal').modal('show');
+                }
+            }
+        });
+    });
+});
+</script>
+
