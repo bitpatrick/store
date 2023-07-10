@@ -11,6 +11,10 @@
 	object-fit: scale-down;
 	/* Questa proprietà ridimensiona l'immagine per riempire il box (senza distorsioni) */
 }
+
+.btn-fixed-width {
+    width: 40px;  /* Sostituisci con la larghezza desiderata */
+}
 </style>
 <title>Home</title>
 </head>
@@ -18,7 +22,24 @@
 	<jsp:include page="navbar.jsp" />
 	
 	<!-- Modal -->
-	<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	
+	<!-- Modal CART -->
+	<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -38,20 +59,17 @@
 				  </thead>
 				  <tbody>
 				  <c:forEach var="productInCart" items="${productsInCart}" varStatus="status">
-				    
 				    <tr class="product-row-${productInCart.key.id()}">
-
 				    	<input type="hidden" class="product-id" value="${productInCart.key.id()}">
 				    	<th scope="row">${status.count}</th>
 				    	<td>${productInCart.key.name()}</td>
 				    	<td class="product-qty">${productInCart.value}</td>
-
 				    	<c:set var="total" value="${productInCart.value * productInCart.key.price()}"/>
       					<td><c:out value="${total}" /></td>
       					<td>
       						<div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
-  								<button type="button" class="btn btn-outline-primary">+</button>
- 								<button type="button" class="btn btn-outline-primary">-</button>
+  								<button type="button" class="btn btn-outline-primary btn-fixed-width">+</button>
+ 								<button type="button" class="btn btn-outline-primary btn-fixed-width">-</button>
 							</div>
 						</td>
 				    </tr>
@@ -67,10 +85,14 @@
 	  </div>
 	</div>
 	
+	<!-- CONTAINER -->
 	<div class="container mt-5">
+		<!-- FIRST ROW -->
 		<div class="row">
 			<c:forEach var="product" items="${products}">
 				<div class="col-lg-4 col-md-6 mb-4">
+					
+					<!-- CARD -->
 					<div class="card">
 						<img 
 							class="card-img-top product-image"
@@ -79,15 +101,13 @@
 						<div class="card-body">
 							<h5 class="card-title">${product.name()}</h5>
 							<p class="card-text">${product.category()}</p>
-							<form
-								action="${pageContext.request.contextPath}/cart-addProduct/${product.id()}"
-								method="post" class="row row-cols-lg-auto g-3 flex-nowrap">
-								<div class="col-12">
-									<a href="#" class="btn btn-primary form">Go somewhere</a>
-								</div>
-								<!-- CART -->
-								<div class="col-12 flex-shrink-1">
-									<div class="input-group mb-3">
+							<div class="d-flex">
+							
+									<a href="#" class="btn btn-primary btn-sm mt-2 mb-2 me-auto">Go somewhere</a>
+									<!-- CART -->
+								
+									<input type="hidden" name="productId" value="${product.id()}"> <!-- questo campo nascosto contiene l'ID del prodotto -->
+									<div class="input-group input-group-sm w-50">
 										<span class="input-group-text" id="basic-addon1">
 											<button type="submit" class="btn btn-primary">
 												<svg 
@@ -102,15 +122,15 @@
 											</button>
 										</span>
 										<input 
-											type="text" 
-											name="quantity" 
+											type="number" 
+											min="0" 
+											name="quantityProduct${product.id()}" 
 											class="form-control"
 											placeholder="Qty" 
 											aria-label="Qty"
 											aria-describedby="basic-addon1">
 									</div>
 								</div>
-							</form>
 						</div>
 					</div>
 				</div>
@@ -125,7 +145,57 @@
 
 <script>
 	$(document).ready(function(){
-	    
+		
+		$(".btn.btn-primary").click(function(event) {
+		    event.preventDefault(); // preveniamo l'azione di default del form
+
+		    var productId = $(this).parent().parent().siblings('input[name="productId"]').val(); // ottieni l'ID del prodotto
+		    var quantityInput = $('input[name="quantityProduct' + productId + '"]'); // ottieni l'input della quantità
+		    var quantity = quantityInput.val(); // ottieni la quantità
+
+		    // verifica se quantity e productId non sono vuoti
+		    if(quantity !== '' && productId !== '') {
+		        $.ajax({
+		            url: '${pageContext.request.contextPath}/cart-addProduct/' + productId, // URL a cui inviare la richiesta, aggiungi l'ID del prodotto
+		            type: 'GET',
+		            contentType: 'application/json',
+		            data: {
+		                qty: quantity // inviamo la quantità come dato alla richiesta
+		            },
+		            success: function(response) {
+		                
+		            	// Se la chiamata ha avuto successo, riempi la modale con il messaggio di successo e mostrala
+		                var successMessage = `
+		                    <div class="alert alert-success">
+		                        <strong>Success!</strong> successful action.
+		                    </div>
+		                `;
+		                $('#successModal .modal-body').html(successMessage);
+		                $('#successModal').modal('show');
+		           
+		            },
+		            error: function(xhr, status, error) {
+		                
+		            	// Se c'è un errore, mostra un alert con l'errore
+		            	var errorMessage = `
+		                    <div class="alert alert-danger">
+		                        <strong>Success!</strong> error action.
+		                    </div>
+		                `;
+		                $('#successModal .modal-body').html(errorMessage);
+		                $('#successModal').modal('show');
+		            }
+					
+		        });
+		    } else {
+		        alert("Inserisci una quantità e assicurati che il prodotto sia valido.");
+		    }
+		    
+		 	// Qui resetta il campo di input
+            // quantityInput.val(''); 
+		 	
+		});
+		
 		$('.btn-outline-primary').click(function(){
 	        
 	    	var productID = $(this).closest('tr').find('.product-id').val();
@@ -134,24 +204,56 @@
 	        var url = isIncrement ? '${pageContext.request.contextPath}/cart-addProduct/' + productID : '${pageContext.request.contextPath}/cart-removeProduct/${product.id()}';
 	
 	        $.ajax({
-	            type: 'POST',
+	            type: 'GET',
 	            url: url,
 	            contentType: 'application/json',
+	            data: {
+	                qty: 1 // inviamo la quantità come dato alla richiesta
+	            },
 	            success: function(response) {
 	                    
 	                	// seleziona l'elemento DOM della quantità del prodotto
 	                    var qtyElement = $('.product-row-' + productID + ' .product-qty');
 	                    var currentQty = parseInt(qtyElement.text());
 	                    
+	                	// Se la chiamata ha avuto successo, riempi la modale con il messaggio di successo e mostrala
+		                var successMessage = `
+		                    <div class="alert alert-success">
+		                        <strong>Success!</strong> successful action.
+		                    </div>
+		                `;
+		                
+		                $('#cartModal .modal-body').prepend(successMessage);
+		                
+		            	// Rimuovi il messaggio di successo dopo 5 secondi
+		                setTimeout(function() {
+		                    $(".alert-success").first().fadeOut('slow', function() {
+		                        $(this).remove();
+		                    });
+		                }, 5000); // 5000 ms = 5 s
+	                    
 	                    // incrementa o decrementa la quantità del prodotto nel DOM
 	                    qtyElement.text(isIncrement ? currentQty + 1 : currentQty - 1);
-	                    
-	                    // riapri la modale
-	                    $('#exampleModal').modal('show');
-	            }
+	                 	
+	            },
+	        	error: function(jqXHR, textStatus, errorThrown) {
+	            	if (jqXHR.status === 500) {
+		                // Creare un elemento di allerta se il server restituisce un errore 500
+						var alertElement = $('<div class="alert alert-danger" role="alert">A simple danger alertcheck it out!</div>');
+		                
+		            	// Aggiungi l'elemento di allerta al DOM (aggiusta il selettore a seconda di dove vuoi che appaia l'allerta)
+		                $('#exampleModal .modal-body').prepend(alertElement);
+	
+		            }
+		        }
 	        });
 	    });
 	});
+	
+	// Aggiungi un evento listener alla modale
+	$('#successModal').on('hidden.bs.modal', function (e) {
+	  // quando la modale viene chiusa, ricarica la pagina
+	  window.location.reload();
+	});
+	
 </script>
-
-

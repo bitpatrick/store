@@ -1,5 +1,7 @@
 package it.bitprojects.store.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.ServletContextAware;
 
 import it.bitprojects.store.dto.Purchase;
+import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.service.StoreService;
 import jakarta.servlet.ServletContext;
 import net.sf.jasperreports.engine.JRException;
@@ -60,10 +64,6 @@ public class MainRestController implements ServletContextAware {
 
 	}
 
-	@PostMapping("/purchase")
-	@ResponseStatus(HttpStatus.OK)
-	public void purchase(Purchase purchase) {
-
-	}
+	
 
 }

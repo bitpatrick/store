@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import it.bitprojects.store.dto.ProductDto;
@@ -58,34 +59,15 @@ public class MainController {
 		return "purchase";
 	}
 
-	@PostMapping(value = "/cart-addProduct/{idProduct}", consumes = APPLICATION_FORM_URLENCODED_VALUE)
-	public String addProduct(@PathVariable("idProduct") Integer idProduct,
-			@RequestBody MultiValueMap<String, String> params, Model model) {
-
-		int qty = Integer.parseInt(params.getFirst("quantity"));
+	@GetMapping(value = "/cart-addProduct/{idProduct}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public void addProduct(@PathVariable("idProduct") Integer idProduct, @RequestParam("qty") Integer qty) {
 
 		// recupero carrello
 		Cart cart = this.cartProvider.get();
-
-		LocalDate date = (LocalDate) model.getAttribute("date");
-		System.out.println("data aggiunta carello: " + date);
 
 		// aggiungi il prodotto al carrello con la relativa quantità
 		this.store.addProductToCart(idProduct, qty, cart);
-
-		// ritorna alla home
-		return "redirect:/home";
-	}
-
-	@PostMapping(value = "/cart-addProduct/{idProduct}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-	@ResponseStatus(HttpStatus.OK)
-	public void addProduct(@PathVariable("idProduct") Integer idProduct) {
-
-		// recupero carrello
-		Cart cart = this.cartProvider.get();
-
-		// aggiungi il prodotto al carrello con la relativa quantità
-		this.store.addProductToCart(idProduct, 1, cart);
 	}
 
 	/**
