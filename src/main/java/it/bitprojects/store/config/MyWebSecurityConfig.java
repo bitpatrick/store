@@ -73,17 +73,20 @@ public class MyWebSecurityConfig {
 	    .authorizeHttpRequests(
 	        
 	        t -> 
-	        t.requestMatchers("/views/jsp/login.jsp","/views/jsp/lightSwitch.jsp","/static/**").permitAll()
+	        t.requestMatchers("/views/jsp/**","/static/**").permitAll()
 	        .requestMatchers("/h2**").hasRole("ADMIN")
-	        .anyRequest().permitAll()
+	        .requestMatchers("/home").permitAll()
+	        .anyRequest().authenticated()
 	    
 	    )
-	    
 	    .formLogin(form -> form.loginPage("/login")
 	                .defaultSuccessUrl("/home")
 	                .permitAll() 
 	    )
-	    .logout(l -> l.permitAll())
+	    
+	    .logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
+	    
+	    
 	    .rememberMe(r -> r.rememberMeServices(rememberMeServices()))
 	    ;
 

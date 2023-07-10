@@ -22,7 +22,8 @@
 
 	<dependencies>
 
-		<!-- https://mvnrepository.com/artifact/org.glassfish.hk2.external/javax.inject -->
+		<!--
+		https://mvnrepository.com/artifact/org.glassfish.hk2.external/javax.inject -->
 		<dependency>
 			<groupId>jakarta.inject</groupId>
 			<artifactId>jakarta.inject-api</artifactId>
@@ -165,6 +166,14 @@
 				org.springframework</groupId>
 			<artifactId>spring-jdbc</artifactId>
 			<version>6.0.9</version>
+		</dependency>
+
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>6.1.1</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
