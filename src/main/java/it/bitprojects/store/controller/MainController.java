@@ -1,6 +1,6 @@
 package it.bitprojects.store.controller;
 
-import static org.springframework.http.MediaType.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,14 +8,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -51,12 +49,6 @@ public class MainController {
 
 		// il modello verrà reindirizzato alla view
 		return "home";
-	}
-
-	@GetMapping("/purchase")
-	public String purchase() {
-
-		return "purchase";
 	}
 
 	@GetMapping(value = "/cart-addProduct/{idProduct}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
 <%@include file="customTags.jsp"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
+<%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>
+<%@ page import="org.springframework.security.core.Authentication" %>
+<%@ page import="org.springframework.security.core.GrantedAuthority" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,6 +25,9 @@
 </head>
 <body>
 	<jsp:include page="navbar.jsp" />
+	
+	<input type="hidden" id="isAuthenticated" value="<sec:authorize access='isAuthenticated()'>true</sec:authorize>"/>
+
 	
 	<!-- Modal -->
 	<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -104,6 +111,8 @@
 							<p class="card-text">${product.category()}</p>
 							<div class="d-flex">
 							
+									 
+							
 									<a href="#" class="btn btn-primary btn-sm mt-2 mb-2 me-auto">Go somewhere</a>
 									<!-- CART -->
 								
@@ -145,11 +154,19 @@
 <%@include file="jQuery.jsp"%>
 
 <script>
+	
 	$(document).ready(function(){
 		
 		$(".btn.btn-primary").click(function(event) {
 		    event.preventDefault(); // preveniamo l'azione di default del form
 
+		    var isAuthenticated = $('#isAuthenticated').val() === 'true';
+
+		    if (!isAuthenticated) {
+		        alert('Non sei autenticato');
+		        return;
+		    }
+		    
 		    var productId = $(this).parent().parent().siblings('input[name="productId"]').val(); // ottieni l'ID del prodotto
 		    var quantityInput = $('input[name="quantityProduct' + productId + '"]'); // ottieni l'input della quantità
 		    var quantity = quantityInput.val(); // ottieni la quantità

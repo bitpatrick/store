@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -16,16 +17,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
 @Import(MyWebConfig.class)
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class MyWebSecurityConfig {
 
 	@Bean
@@ -64,16 +69,37 @@ public class MyWebSecurityConfig {
 //
 //		return http.build();
 //	}
+	
+	@Bean
+	public AccessDeniedHandler customAccessDeniedHandler() {
+		return new CustomAccessDeniedHandler();
+	}
+	
+	@Bean 
+	public RequestMatcher requestMatcher() {
+		return new RequestMatcher() {
+			
+			@Override
+			public boolean matches(HttpServletRequest request) {
+
+				if ( request.getRequestURI().contains("addProduct") )
+					return true;
+				
+				return true;
+			}
+		};
+	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-	    http
+	    
+		http
 	    .authenticationManager(providerManager())
 	    .csrf(t -> t.disable())
 	    .authorizeHttpRequests(
 	        
 	        t -> 
-	        t.requestMatchers("/views/jsp/**","/static/**").permitAll()
+	        t.requestMatchers("/views/**","/static/**").permitAll()
 	        .requestMatchers("/h2**").hasRole("ADMIN")
 	        .requestMatchers("/home").permitAll()
 	        .anyRequest().authenticated()
@@ -83,14 +109,9 @@ public class MyWebSecurityConfig {
 	                .defaultSuccessUrl("/home")
 	                .permitAll() 
 	    )
-	    
 	    .logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-	    
-	    
 	    .rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-	    ;
-
-	    http.headers().frameOptions().disable(); // disabilitare le opzioni di sicurezza per i frame, che sono necessarie per l'H2-console.
+	    .headers().frameOptions().disable(); // disabilitare le opzioni di sicurezza per i frame, che sono necessarie per l'H2-console.
 
 	    return http.build();
 	}
