@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -98,8 +99,9 @@ public class MyWebSecurityConfig {
 	    .csrf(t -> t.disable())
 	    .authorizeHttpRequests(
 	        
-	        t -> 
-	        t.requestMatchers("/views/**","/static/**").permitAll()
+	        (authorize) -> authorize
+	        .dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+	        .requestMatchers("/views/**","/static/**").permitAll()
 	        .requestMatchers("/h2**").hasRole("ADMIN")
 	        .requestMatchers("/home").permitAll()
 	        .anyRequest().authenticated()

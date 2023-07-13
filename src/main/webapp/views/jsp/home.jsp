@@ -26,10 +26,7 @@
 <body>
 	<jsp:include page="navbar.jsp" />
 	
-	<input type="hidden" id="isAuthenticated" value="<sec:authorize access='isAuthenticated()'>true</sec:authorize>"/>
-
-	
-	<!-- Modal -->
+	<!-- Modal ADDED PRODUCT -->
 	<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
 	    <div class="modal-content">
@@ -99,7 +96,6 @@
 		<div class="row">
 			<c:forEach var="product" items="${products}">
 				<div class="col-lg-4 col-md-6 mb-4">
-					
 					<!-- CARD -->
 					<div class="card">
 						<img 
@@ -110,37 +106,37 @@
 							<h5 class="card-title">${product.name()}</h5>
 							<p class="card-text">${product.category()}</p>
 							<div class="d-flex">
-							
-									 
-							
 									<a href="#" class="btn btn-primary btn-sm mt-2 mb-2 me-auto">Go somewhere</a>
-									<!-- CART -->
-								
-									<input type="hidden" name="productId" value="${product.id()}"> <!-- questo campo nascosto contiene l'ID del prodotto -->
-									<div class="input-group input-group-sm w-50">
-										<span class="input-group-text" id="basic-addon1">
-											<button type="submit" class="btn btn-primary">
-												<svg 
-													xmlns="http://www.w3.org/2000/svg" 
-													width="16"
-													height="16" fill="currentColor" 
-													class="bi bi-cart-plus"
-													viewBox="0 0 16 16">
-														<path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z" />
-														<path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-												</svg>
-											</button>
-										</span>
-										<input 
-											type="number" 
-											min="0" 
-											name="quantityProduct${product.id()}" 
-											class="form-control"
-											placeholder="Qty" 
-											aria-label="Qty"
-											aria-describedby="basic-addon1">
-									</div>
-								</div>
+									
+									<sec:authorize access="isAuthenticated()">
+											<!-- CART -->
+											<input type="hidden" name="productId" value="${product.id()}"> <!-- questo campo nascosto contiene l'ID del prodotto -->
+											<div class="input-group input-group-sm w-50">
+												<span class="input-group-text" id="basic-addon1">
+													<button type="submit" class="btn btn-primary">
+														<svg 
+															xmlns="http://www.w3.org/2000/svg" 
+															width="16"
+															height="16" fill="currentColor" 
+															class="bi bi-cart-plus"
+															viewBox="0 0 16 16">
+																<path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9V5.5z" />
+																<path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
+														</svg>
+													</button>
+												</span>
+												<input 
+													type="number" 
+													min="0" 
+													name="quantityProduct${product.id()}" 
+													class="form-control"
+													placeholder="Qty" 
+													aria-label="Qty"
+													aria-describedby="basic-addon1">
+											</div>
+									</sec:authorize>
+									
+							</div>
 						</div>
 					</div>
 				</div>
@@ -159,14 +155,7 @@
 		
 		$(".btn.btn-primary").click(function(event) {
 		    event.preventDefault(); // preveniamo l'azione di default del form
-
-		    var isAuthenticated = $('#isAuthenticated').val() === 'true';
-
-		    if (!isAuthenticated) {
-		        alert('Non sei autenticato');
-		        return;
-		    }
-		    
+    
 		    var productId = $(this).parent().parent().siblings('input[name="productId"]').val(); // ottieni l'ID del prodotto
 		    var quantityInput = $('input[name="quantityProduct' + productId + '"]'); // ottieni l'input della quantità
 		    var quantity = quantityInput.val(); // ottieni la quantità
@@ -214,8 +203,11 @@
 		 	
 		});
 		
+		// Definisci la variabile all'esterno del click handler
+		var i = 1;
+		
 		$('.btn-outline-primary').click(function(){
-	        
+			
 	    	var productID = $(this).closest('tr').find('.product-id').val();
 	        var isIncrement = $(this).text() === "+";  // verifica se l'azione è un incremento o un decremento
 	
@@ -233,22 +225,27 @@
 	                	// seleziona l'elemento DOM della quantità del prodotto
 	                    var qtyElement = $('.product-row-' + productID + ' .product-qty');
 	                    var currentQty = parseInt(qtyElement.text());
+	                    var idSuccesMessage = "successMessage" + i;
 	                    
-	                	// Se la chiamata ha avuto successo, riempi la modale con il messaggio di successo e mostrala
-		                var successMessage = `
-		                    <div class="alert alert-success">
-		                        <strong>Success!</strong> successful action.
-		                    </div>
-		                `;
+	                 	// Se la chiamata ha avuto successo, riempi la modale con il messaggio di successo e mostrala
+	                   var successMessage = 
+			                '<div id="successMessage' + i + '" class="alert alert-success">' +
+			                '<strong>Success!</strong> successful action.' +
+			                '</div>';
 		                
 		                $('#cartModal .modal-body').prepend(successMessage);
 		                
 		            	// Rimuovi il messaggio di successo dopo 5 secondi
-		                setTimeout(function() {
-		                    $(".alert-success").first().fadeOut('slow', function() {
-		                        $(this).remove();
-		                    });
-		                }, 5000); // 5000 ms = 5 s
+		                // utilizza una IIFE per fissare il valore corrente di "i"
+		                (function(currentI) {
+		                    setTimeout(function() {
+		                        $('#successMessage' + currentI).fadeOut('slow', function() {
+		                            $(this).remove();
+		                        });
+		                    }, 5000); // 5000 ms = 5 s
+		                })(i);
+		                
+		                i++;
 	                    
 	                    // incrementa o decrementa la quantità del prodotto nel DOM
 	                    qtyElement.text(isIncrement ? currentQty + 1 : currentQty - 1);
@@ -256,11 +253,27 @@
 	            },
 	        	error: function(jqXHR, textStatus, errorThrown) {
 	            	if (jqXHR.status === 500) {
-		                // Creare un elemento di allerta se il server restituisce un errore 500
-						var alertElement = $('<div class="alert alert-danger" role="alert">A simple danger alertcheck it out!</div>');
+		                
+	            		// Creare un elemento di allerta se il server restituisce un errore 500
+						 var alertMessage = 
+				                '<div id="alertMessage' + i + '" class="alert alert-danger" role="alert">' +
+				                '<strong>No Product in Stock</strong>' +
+				                '</div>';
 		                
 		            	// Aggiungi l'elemento di allerta al DOM (aggiusta il selettore a seconda di dove vuoi che appaia l'allerta)
-		                $('#exampleModal .modal-body').prepend(alertElement);
+		                $('#cartModal .modal-body').prepend(alertMessage);
+		            	
+		             	// Rimuovi il messaggio di successo dopo 5 secondi
+		                // utilizza una IIFE per fissare il valore corrente di "i"
+		                (function(currentI) {
+		                    setTimeout(function() {
+		                        $('#alertMessage' + currentI).fadeOut('slow', function() {
+		                            $(this).remove();
+		                        });
+		                    }, 5000); // 5000 ms = 5 s
+		                })(i);
+		                
+		                i++;
 	
 		            }
 		        }
