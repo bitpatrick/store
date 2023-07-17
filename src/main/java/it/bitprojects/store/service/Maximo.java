@@ -64,23 +64,35 @@ public class Maximo implements StoreService {
 	@Override
 	public List<ProductDto> getAllProducts() {
 
-		return warehouse.getAll(Product.class).stream().map(p -> new ProductDto(p.getId(), p.getName(), p.getCategory(), p.getPrice())).toList();
+		return warehouse.getAll(Product.class).stream()
+				.map(p -> new ProductDto(p.getId(), p.getName(), p.getCategory(), p.getPrice())).toList();
 	}
 
 	@Override
 	public void addProductToCart(int idProduct, int qty, Cart cart) {
 
 		// decurta qta prodotto dal magazzino
-		this.warehouse.updateQty(idProduct, qty);
-		
+		this.warehouse.reduceQty(idProduct, qty);
+
 		// recupera scheda prodotto
 		Product product = this.warehouse.getById(idProduct, Product.class);
-		
+
 		// crea dto prodotto
 		ProductDto productDto = new ProductDto(idProduct, product.getName(), product.getCategory(), product.getPrice());
-		
+
 		// inserisco il prodotto nel carrello
 		cart.getProducts().compute(productDto, (p, qtyInCart) -> qtyInCart == null ? qty : qtyInCart + qty);
 	}
+
+	@Override
+	public void removeProductToCart(Integer idProduct, Integer qty, Cart cart) {
+		// chiedo al carello di eliminare il prodotto
+		cart.removeProduct(idProduct, qty);
+
+		// se tutto è andato bene verrà aggiornato lo stock e finisce
+		this.warehouse.incrementQty(idProduct, qty);
+
+	}
+
 
 }

@@ -8,12 +8,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -62,6 +63,25 @@ public class MainController {
 		this.store.addProductToCart(idProduct, qty, cart);
 	}
 
+	/**
+	 * metodo per rimuovere un prodotto dal carello(quando faccio click sul pulsante
+	 * meno)
+	 * 
+	 * @param idProduct
+	 * @param qty
+	 */
+
+	@GetMapping(value = "/cart-removeProduct/{idProduct}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public void removeProduct(@PathVariable("idProduct") Integer idProduct, @RequestParam("qty") Integer qty) {
+
+		// recupero carrello
+		Cart cart = this.cartProvider.get();
+
+		// rimuovo la quantita e nel caso il prodotto dal carello
+		this.store.removeProductToCart(idProduct, qty, cart);
+	}
+	
 	/**
 	 * Questo metodo viene richiamato prima che venga eseguito qualsiasi handler
 	 * method della classe

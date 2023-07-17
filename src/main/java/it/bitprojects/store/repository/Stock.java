@@ -23,5 +23,6 @@ public interface Stock {
 	public Number createOrder(Map<Product, Integer> products);
 	
 	public void updateQty(int idProduct, int qty);
+	
 
 }

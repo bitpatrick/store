@@ -122,7 +122,11 @@ public class Warehouse implements Stock {
 		return products;
 	}
 
-	public void updateQty(int idProduct, int qty) {
+	/**
+	 * con questo metodo tolgo quantita del prodotto e poi chiamo il metodo per
+	 * aggiornare
+	 */
+	public void reduceQty(int idProduct, int qty) {
 
 		String selectSql = "SELECT qty FROM stocks WHERE id_product = " + idProduct + " AND qty >= " + qty;
 
@@ -142,10 +146,31 @@ public class Warehouse implements Stock {
 
 			throw new ProductNotAvailableException();
 		}
+		updateQty(idProduct, newQty);
 
+	}
+
+	/**
+	 * devo fare metodo per aumentare la quantita e poi aggiornarla di nuovo nello
+	 * stock
+	 */
+	public void incrementQty(int idProduct, int qty) {
+		String selectSql = "SELECT qty FROM stocks WHERE id_product = " + idProduct;
+
+		int qtyInStock = jdbcTemplate.queryForObject(selectSql, Integer.class);
+
+		int newQty = qtyInStock + qty;
+
+		updateQty(idProduct, newQty);
+
+	}
+
+	@Override
+	public void updateQty(int idProduct, int newQty) {
 		String updateSql = "UPDATE stocks SET qty = ? WHERE id_product = ?";
 
 		jdbcTemplate.update(updateSql, newQty, idProduct);
+
 	}
 
 }

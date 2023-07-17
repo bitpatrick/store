@@ -49,11 +49,11 @@ public class MyWebSecurityConfig {
 		authProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
 		return authProvider;
 	}
-	
+
 	@Bean
 	public AuthenticationManager providerManager() {
 		return new ProviderManager(daoAuthenticationProvider());
-		
+
 	}
 
 //	@Autowired
@@ -70,22 +70,22 @@ public class MyWebSecurityConfig {
 //
 //		return http.build();
 //	}
-	
+
 	@Bean
 	public AccessDeniedHandler customAccessDeniedHandler() {
 		return new CustomAccessDeniedHandler();
 	}
-	
-	@Bean 
+
+	@Bean
 	public RequestMatcher requestMatcher() {
 		return new RequestMatcher() {
-			
+
 			@Override
 			public boolean matches(HttpServletRequest request) {
 
-				if ( request.getRequestURI().contains("addProduct") )
+				if (request.getRequestURI().contains("addProduct"))
 					return true;
-				
+
 				return true;
 			}
 		};
@@ -104,7 +104,7 @@ public class MyWebSecurityConfig {
 	        .requestMatchers("/views/**","/static/**").permitAll()
 	        .requestMatchers("/h2**").hasRole("ADMIN")
 	        .requestMatchers("/home").permitAll()
-	        .anyRequest().authenticated()
+	        .anyRequest().permitAll()
 	    
 	    )
 	    .formLogin(form -> form.loginPage("/login")
@@ -117,7 +117,7 @@ public class MyWebSecurityConfig {
 
 	    return http.build();
 	}
-	
+
 	@Bean
 	RememberMeServices rememberMeServices() {
 		RememberMeTokenAlgorithm encodingAlgorithm = RememberMeTokenAlgorithm.SHA256;

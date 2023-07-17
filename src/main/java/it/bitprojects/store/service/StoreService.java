@@ -20,4 +20,6 @@ public interface StoreService {
 
 	public void addProductToCart(int idProduct, int qty, Cart cart);
 
+	public void removeProductToCart(Integer idProduct, Integer qty, Cart cart);
+
 }
