@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStock;
+import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.Purchase;
 import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.model.Product;
@@ -50,7 +51,6 @@ public class Maximo implements StoreService {
 
 	@Override
 	public Resource generateReportOfProductsInStock(String backgroundImage, Path output) throws JRException {
-
 		// datas
 		List<Product> products = warehouse.getAll(Product.class);
 		List<ProductInStock> productsInStock = warehouse.getAllProductsInStock();
@@ -63,9 +63,15 @@ public class Maximo implements StoreService {
 
 	@Override
 	public List<ProductDto> getAllProducts() {
-
 		return warehouse.getAll(Product.class).stream()
 				.map(p -> new ProductDto(p.getId(), p.getName(), p.getCategory(), p.getPrice())).toList();
+	}
+	
+	
+	//TODO A
+	@Override
+	public List<ProductInStockDto> getProductsInStock() {
+		return warehouse.getProductsInStock();
 	}
 
 	@Override
@@ -93,6 +99,5 @@ public class Maximo implements StoreService {
 		this.warehouse.incrementQty(idProduct, qty);
 
 	}
-
 
 }

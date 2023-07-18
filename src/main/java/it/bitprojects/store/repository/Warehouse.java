@@ -18,6 +18,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import it.bitprojects.store.dto.ProductInStock;
+import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.exceptions.ProductNotAvailableException;
 import it.bitprojects.store.model.Category;
 import it.bitprojects.store.model.Order;
@@ -154,6 +155,7 @@ public class Warehouse implements Stock {
 	 * devo fare metodo per aumentare la quantita e poi aggiornarla di nuovo nello
 	 * stock
 	 */
+
 	public void incrementQty(int idProduct, int qty) {
 		String selectSql = "SELECT qty FROM stocks WHERE id_product = " + idProduct;
 
@@ -171,6 +173,32 @@ public class Warehouse implements Stock {
 
 		jdbcTemplate.update(updateSql, newQty, idProduct);
 
+	}
+
+	public List<ProductInStockDto> getProductsInStock() {
+		String sql = "SELECT * FROM PRODUCTS p INNER JOIN STOCKS s ON p.id = s.id_product";
+		List<ProductInStockDto> products = new ArrayList<>();
+
+		jdbcTemplate.query(sql, new RowCallbackHandler() {
+			@Override
+			public void processRow(ResultSet rs) throws SQLException {
+				// retrieve info product
+
+				int id = rs.getInt("id");
+				String name=rs.getString("name");
+				Category category = Category.valueOf(rs.getString("category".toUpperCase()));
+				BigDecimal price=rs.getBigDecimal("price");
+				
+				// retrieve qty product in warehouse
+				int qty = rs.getInt("qty");
+
+				ProductInStockDto product = new ProductInStockDto(id, name, category, price, qty);
+
+				// add product to list
+				products.add(product);
+			}
+		});
+		return products;
 	}
 
 }
