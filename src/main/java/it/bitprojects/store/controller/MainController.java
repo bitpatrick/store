@@ -13,13 +13,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.model.Cart;
+import it.bitprojects.store.service.ServiceProva;
 import it.bitprojects.store.service.StoreService;
 import jakarta.inject.Provider;
 
@@ -31,6 +31,8 @@ public class MainController {
 
 	@Autowired
 	private StoreService store;
+
+	private ServiceProva serviceProva;
 
 	@GetMapping("/home")
 	public String home(Model model) {
@@ -50,6 +52,12 @@ public class MainController {
 
 		// il modello verrà reindirizzato alla view
 		return "home";
+	}
+
+	@GetMapping("/stampa")
+	@ResponseStatus(HttpStatus.OK)
+	public void stampa() {
+
 	}
 
 	@GetMapping(value = "/cart-addProduct/{idProduct}", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -81,7 +89,7 @@ public class MainController {
 		// rimuovo la quantita e nel caso il prodotto dal carello
 		this.store.removeProductToCart(idProduct, qty, cart);
 	}
-	
+
 	/**
 	 * Questo metodo viene richiamato prima che venga eseguito qualsiasi handler
 	 * method della classe

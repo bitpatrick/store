@@ -9,6 +9,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -16,8 +17,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+import it.bitprojects.store.handlers.PippoInterceptor;
 import it.bitprojects.store.model.Cart;
-import jakarta.servlet.http.HttpServletRequest;
 
 @EnableWebMvc
 @Configuration
@@ -48,18 +49,31 @@ public class MyWebConfig implements WebMvcConfigurer {
 		r.setViewName("login");
 		r.setStatusCode(HttpStatus.OK);
 	}
-	
+
 	@Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/js/**").addResourceLocations("/static/js/");
-        registry.addResourceHandler("/static/img/**").addResourceLocations("/static/img/");
-        registry.addResourceHandler("/static/views/jsp/**").addResourceLocations("/static/views/jsp");
-    }
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/static/js/**").addResourceLocations("/static/js/");
+		registry.addResourceHandler("/static/img/**").addResourceLocations("/static/img/");
+		registry.addResourceHandler("/static/views/jsp/**").addResourceLocations("/static/views/jsp");
+	}
+
+	/**
+	 * metodo aggiunto dall'academy per stampare pippo se intercettato nelle request
+	 * 
+	 * @return
+	 */
 	
+
 	@Bean
 	@Scope(WebApplicationContext.SCOPE_SESSION)
-	public Cart cart(){
-	      return new Cart();
+	public Cart cart() {
+		return new Cart();
+	}
+
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new PippoInterceptor());
+		WebMvcConfigurer.super.addInterceptors(registry);
 	}
 
 //	@Bean

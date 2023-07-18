@@ -11,10 +11,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 
-/*
- * PATRIZIO
- */
-
 @Configuration
 @ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
 		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
@@ -25,10 +21,8 @@ public class AppConfig {
 	 */
 	@Bean
 	public DataSource dataSource() {
-		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-				.addScript("classpath:jdbc/schema.sql")
-				.addScript("classpath:jdbc/test-data.sql")
-				.build();
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).addScript("classpath:jdbc/schema.sql")
+				.addScript("classpath:jdbc/test-data.sql").build();
 	}
 
 	/**
@@ -46,7 +40,5 @@ public class AppConfig {
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
 		return new DataSourceTransactionManager(dataSource);
 	}
-	
-
 
 }
