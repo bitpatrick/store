@@ -32,7 +32,6 @@ public class MainController {
 	@Autowired
 	private StoreService store;
 
-	private ServiceProva serviceProva;
 
 	@GetMapping("/home")
 	public String home(Model model) {

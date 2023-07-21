@@ -61,7 +61,6 @@ public class MyWebConfig implements WebMvcConfigurer {
 	 * 
 	 * @return
 	 */
-	
 
 	@Bean
 	@Scope(WebApplicationContext.SCOPE_SESSION)
@@ -71,9 +70,11 @@ public class MyWebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(new PippoInterceptor());
+		registry.addInterceptor(new PippoInterceptorHandler());
+		registry.addInterceptor(new IPLoggingInterceptorHandler());
 		WebMvcConfigurer.super.addInterceptors(registry);
 	}
+
 
 //	@Bean
 //	public JsonMapper jsonMapper() {
