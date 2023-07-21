@@ -100,4 +100,16 @@ public class Maximo implements StoreService {
 
 	}
 
+	@Override
+	public int getNumeroFile() {
+		
+		return warehouse.getNumeroFile();
+	}
+
+	@Override
+	public void saveFile(String fileName) {
+		warehouse.saveFile(fileName);
+		
+	}
+
 }

@@ -185,10 +185,10 @@ public class Warehouse implements Stock {
 				// retrieve info product
 
 				int id = rs.getInt("id");
-				String name=rs.getString("name");
+				String name = rs.getString("name");
 				Category category = Category.valueOf(rs.getString("category".toUpperCase()));
-				BigDecimal price=rs.getBigDecimal("price");
-				
+				BigDecimal price = rs.getBigDecimal("price");
+
 				// retrieve qty product in warehouse
 				int qty = rs.getInt("qty");
 
@@ -199,6 +199,19 @@ public class Warehouse implements Stock {
 			}
 		});
 		return products;
+	}
+
+	public int getNumeroFile() {
+		String query = "SELECT COUNT(*) FROM file_name";
+		int numeroFile = jdbcTemplate.queryForObject(query, Integer.class);
+
+		return numeroFile;
+	}
+
+	public void saveFile(String fileName) {
+
+		String query = "INSERT INTO file_name (name) VALUES(?)";
+		jdbcTemplate.update(query, fileName);
 	}
 
 }

@@ -25,4 +25,8 @@ public interface StoreService {
 
 	public List<ProductInStockDto> getProductsInStock();
 
+	public int getNumeroFile();
+
+	public void saveFile(String fileName);
+
 }

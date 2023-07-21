@@ -98,15 +98,19 @@ public class MainRestController implements ServletContextAware {
 	public void saveMessage(@RequestBody MessageDto messageDto) {
 		/*
 		 * devo recuperare i nomi dei file nel db e poi incrementarlo e memorizzare 
+		 * 
+		 * chiamo il service e gli chiedo direttamente un intero  getNumeroFilePresenti
 		 */
-		
-		String  pathFile = servletContext.getRealPath("/WEB-INF/reports/message_from_store.txt");
+		int numeroFile=storeService.getNumeroFile();
+		String fileName = String.format("file%02d", ++numeroFile);
+		String  pathFile = servletContext.getRealPath("/WEB-INF/reports/"+fileName+".txt");
 
 		try (FileWriter writer = new FileWriter(pathFile)) {
 			writer.write(messageDto.message());
 		} catch (IOException e) {
 			System.out.println("impossibile scrivere su file");
 		}
+		storeService.saveFile(fileName);
 	}
 
 	/**
