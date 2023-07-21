@@ -3,16 +3,17 @@ package it.bitprojects.store.controller;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -97,13 +98,17 @@ public class MainRestController implements ServletContextAware {
 	@PostMapping("/message")
 	public void saveMessage(@RequestBody MessageDto messageDto) {
 		/*
-		 * devo recuperare i nomi dei file nel db e poi incrementarlo e memorizzare 
+		 * devo recuperare i nomi dei file nel db e poi incrementarlo e memorizzare
 		 * 
-		 * chiamo il service e gli chiedo direttamente un intero  getNumeroFilePresenti
+		 * chiamo il service e gli chiedo direttamente un intero getNumeroFilePresenti
 		 */
-		int numeroFile=storeService.getNumeroFile();
+		int numeroFile = storeService.getNumeroFile();
 		String fileName = String.format("file%02d", ++numeroFile);
-		String  pathFile = servletContext.getRealPath("/WEB-INF/reports/"+fileName+".txt");
+		String pathFile = servletContext.getRealPath("/WEB-INF/reports/" + fileName + ".txt");
+		/*
+		 * C:\Users\anisoara.balauru\academy_workspace\.metadata\.plugins\org.eclipse.
+		 * wst.server.core\tmp0\wtpwebapps\store\WEB-INF\reports
+		 */
 
 		try (FileWriter writer = new FileWriter(pathFile)) {
 			writer.write(messageDto.message());
@@ -131,33 +136,49 @@ public class MainRestController implements ServletContextAware {
 		return ResponseEntity.ok(new MessageDto(testoFile));
 
 	}
-	
-	
+
 	/**
 	 * endpoint per restituire tutti i nomi dei file in una directory
 	 */
+//	@GetMapping("/paths")
+//	public ResponseEntity<List<String>> getAllPathFiles() {
+//
+//		String path = "C:/Users/anisoara.balauru/academy_workspace";
+//
+//		Set<Path> paths = FileService.listAllFiles(path);
+//
+//		List<String> s = paths.stream().map(p -> p.toString()).toList();
+//
+//		return ResponseEntity.ok(s);
+//	}
 	@GetMapping("/paths")
-	public ResponseEntity<List<String>> getAllPathFiles(){
-		String path="C:/Users/anisoara.balauru/academy_workspace";
-		
-		Set<Path> paths=FileService.listAllFiles(path);
-		
-		List<String> s=paths.stream().map(p -> p.toString()).toList();
-		
-		
-		
-		return ResponseEntity.ok(s);
+	public ResponseEntity<List<String>> getAllPathFiles() {
+		String relativePath = "/WEB-INF/reports/";
+		Set<Path> paths = FileService.listAllFiles(servletContext.getRealPath(relativePath));
+		/*
+		 * interfaccia funzionale =implementazione di qualche funzione
+		 */
+		List<String> stringhe = paths.stream().map(
+
+				new Function<Path, String>() {
+
+					@Override
+					public String apply(Path t) {
+						return t.toString();
+					}
+
+				}).toList();
+//	        List<Resource> resources = paths.stream()
+//	                .map(p -> {
+//	                    try {
+//	                        return new UrlResource(p.toUri());
+//	                    } catch (Exception e) {
+//	                        throw new RuntimeException("Issue in converting file to resource");
+//	                    }
+//	                })
+//	                .collect(Collectors.toList());
+
+		return ResponseEntity.ok(stringhe);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 }
