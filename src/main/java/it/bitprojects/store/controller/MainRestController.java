@@ -156,8 +156,10 @@ public class MainRestController implements ServletContextAware {
 		String relativePath = "/WEB-INF/reports/";
 		Set<Path> paths = FileService.listAllFiles(servletContext.getRealPath(relativePath));
 		/*
-		 * interfaccia funzionale =implementazione di qualche funzione y=f(x)
+		 * interfaccia funzionale =implementazione di qualche funzione
 		 */
+//		implementazione della stessa cosa ma più concisa
+//		List<String> stringhe=paths.stream().map(x -> x.toString() ).toList();
 		List<String> stringhe = paths.stream().map(
 
 				new Function<Path, String>() {
