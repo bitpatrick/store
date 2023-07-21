@@ -36,4 +36,12 @@ CREATE TABLE orders_products (
     FOREIGN KEY(product_id) REFERENCES products(id),
     PRIMARY KEY(order_id, product_id)
 );
-
+/*
+ * crea tabella che memorizza i nomi dei file , comincio da file 01 
+ * 
+ */
+CREATE TABLE file_name(
+   id INT AUTO_INCREMENT,
+   name VARCHAR(500),
+    PRIMARY KEY(id,name)
+);

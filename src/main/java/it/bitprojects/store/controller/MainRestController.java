@@ -96,7 +96,12 @@ public class MainRestController implements ServletContextAware {
 	 */
 	@PostMapping("/message")
 	public void saveMessage(@RequestBody MessageDto messageDto) {
-		String pathFile = "C:/users/anisoara.balauru/message_from_store.txt";
+		/*
+		 * devo recuperare i nomi dei file nel db e poi incrementarlo e memorizzare 
+		 */
+		
+		String  pathFile = servletContext.getRealPath("/WEB-INF/reports/message_from_store.txt");
+
 		try (FileWriter writer = new FileWriter(pathFile)) {
 			writer.write(messageDto.message());
 		} catch (IOException e) {
