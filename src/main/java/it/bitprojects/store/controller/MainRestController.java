@@ -182,5 +182,11 @@ public class MainRestController implements ServletContextAware {
 
 		return ResponseEntity.ok(stringhe);
 	}
+	
+	@GetMapping("hello")
+	public ResponseEntity<String> helloWorld() {
+		
+		return ResponseEntity.ok("hello");
+	}
 
 }

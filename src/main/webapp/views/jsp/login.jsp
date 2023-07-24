@@ -49,6 +49,21 @@
 			</div>
 		</form>
 	</div>
+	
+	<h1>-----------------------------------------------------------------</h1>
+	 <p>
+      Well, hello there!
+    </p>
+    <p>
+      We're going to now talk to the GitHub API. Ready?
+      <a href="https://github.com/login/oauth/authorize?scope=read:user&client_id=727109d7f1ebfe825d11">Click here</a> to begin!
+      <a href="${pageContext.request.contextPath}/oauth2/authorization/github">Click here2</a> to begin!
+    </p>
+    <p>
+      If that link doesn't work, remember to provide your own <a href="/apps/building-oauth-apps/authorizing-oauth-apps/">Client ID</a>!
+    </p>
+	<h1>-----------------------------------------------------------------</h1>
+	
 </body>
 </html>
 
