@@ -102,7 +102,7 @@ public class MyWebSecurityConfig {
 	        (authorize) -> authorize
 	        .dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
 	        .requestMatchers("/views/**","/static/**").permitAll()
-	        .requestMatchers("/h2**").hasRole("ADMIN")
+	        .requestMatchers("/h2**").permitAll()
 	        .requestMatchers("/home").permitAll()
 	        .anyRequest().permitAll()
 	    

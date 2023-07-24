@@ -1,6 +1,12 @@
 package it.bitprojects.store.controller;
 
+import java.io.IOException;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
 import it.bitprojects.store.exceptions.ProductNotAvailableException;
 
@@ -11,4 +17,10 @@ public class ControllerAdvice {
 	public String handleException(ProductNotAvailableException ex) {
 		return "/home";
 	}
+
+	 @ExceptionHandler(IOException.class)
+	    public ResponseEntity<String> handleIOException(IOException ex) {
+	        String errorMessage = "Errore durante la lettura/scrittura del file.";
+	        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 }

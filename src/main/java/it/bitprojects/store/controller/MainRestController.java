@@ -8,12 +8,10 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -120,19 +118,14 @@ public class MainRestController implements ServletContextAware {
 
 	/**
 	 * poi un altro end point dove rimandi indietro il file in formato json usando
+	 * @throws IOException 
 	 * 
 	 */
 	@GetMapping("/ask_message_file")
-	public ResponseEntity<MessageDto> getMessageFile() {
-		Resource resource = resourceLoader.getResource("file:C:/Users/anisoara.balauru/message_from_store.txt");
-		String testoFile = null;
-		try {
-			testoFile = resource.getContentAsString(Charset.defaultCharset());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+	public ResponseEntity<MessageDto> getMessageFile() throws IOException {
+		Resource resource = resourceLoader.getResource("file:C:/Users/aisoara.balauru/message_from_store.txt");
+		String testoFile = resource.getContentAsString(Charset.defaultCharset());
+		
 		return ResponseEntity.ok(new MessageDto(testoFile));
 
 	}
