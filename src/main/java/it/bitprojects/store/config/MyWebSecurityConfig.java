@@ -2,7 +2,9 @@ package it.bitprojects.store.config;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +19,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
@@ -38,6 +47,7 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
@@ -132,9 +142,32 @@ public class MyWebSecurityConfig {
 
 	@Bean
 	public AuthenticationProvider daoAuthenticationProvider() {
+		
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(userDetailsManager);
-		authProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+		
+		String encodingId = "bcrypt";
+		Map<String, PasswordEncoder> encoders = new HashMap<>();
+		encoders.put(encodingId, new BCryptPasswordEncoder());
+		encoders.put("ldap", new org.springframework.security.crypto.password.LdapShaPasswordEncoder());
+		encoders.put("MD4", new org.springframework.security.crypto.password.Md4PasswordEncoder());
+		encoders.put("MD5", new org.springframework.security.crypto.password.MessageDigestPasswordEncoder("MD5"));
+		encoders.put("noop", org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance());
+		encoders.put("pbkdf2", Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_5());
+		encoders.put("pbkdf2@SpringSecurity_v5_8", Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+		encoders.put("scrypt", SCryptPasswordEncoder.defaultsForSpringSecurity_v4_1());
+		encoders.put("scrypt@SpringSecurity_v5_8", SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8());
+		encoders.put("SHA-1", new org.springframework.security.crypto.password.MessageDigestPasswordEncoder("SHA-1"));
+		encoders.put("SHA-256",
+				new org.springframework.security.crypto.password.MessageDigestPasswordEncoder("SHA-256"));
+		encoders.put("sha256", new org.springframework.security.crypto.password.StandardPasswordEncoder());
+		encoders.put("argon2", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_2());
+		encoders.put("argon2@SpringSecurity_v5_8", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+		
+		MyCustomPasswordEncoder myCustomPasswordEncoder = new MyCustomPasswordEncoder(encodingId, encoders);
+		
+		authProvider.setPasswordEncoder(myCustomPasswordEncoder);
+		
 		return authProvider;
 	}
 
@@ -175,16 +208,37 @@ public class MyWebSecurityConfig {
 								return false;
 							}
 						}).permitAll()
-						.requestMatchers("/console/**").permitAll()
 						.requestMatchers("/home").permitAll()
+						.requestMatchers("/login**").permitAll()
 						.anyRequest().authenticated()
 				)
+		
+				// aggiunge automaticamente il filtro UsernamePasswordAuthenticationFilter
 				.formLogin(
-						form -> form
+						
+						form -> 
+						
+						form
 						.loginPage("/login")
 						.defaultSuccessUrl("/home")
+//						.failureUrl("/login?error=credenziali%20non%20corrette")
+						.failureHandler(new AuthenticationFailureHandler() {
+							
+							@Override
+							public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+
+								response.sendRedirect("/store/login?error="+exception.getMessage());
+								
+							}
+						})
+						
 						.permitAll()
-				)
+						
+						)
+				
+				
+				
+				
 				.oauth2Login(o -> o
 						.loginProcessingUrl("/login/oauth2")
 						.clientRegistrationRepository(clientRegistrationRepository)

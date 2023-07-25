@@ -7,6 +7,11 @@
 </head>
 <body>
 	<jsp:include page="lightSwitch.jsp" />
+	
+<c:if test="${not empty param.error}">
+    <p><c:out value="${param.error}"/></p>
+</c:if>
+
 	<div class="container text-center pt-5">
 		<div class="col">
 			<div class="row">
