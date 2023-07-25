@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -33,6 +34,8 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -41,6 +44,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletException;
@@ -54,19 +58,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class MyWebSecurityConfig {
-
-	@Bean
-	public UserDetailsService users() {
-		
-		// builder
-		UserBuilder users = User.builder();
-		
-		// utenti
-		UserDetails user = users.username("user").password("password").roles("USER").build();
-		UserDetails admin = users.username("admin").password("password").roles("USER", "ADMIN").build();
-		
-		return new InMemoryUserDetailsManager(user, admin);
-	}
+	
+	@Autowired
+	private UserDetailsManager userDetailsManager;
+	
+	/**
+	 * crea utenti in memoria
+	 * 
+	 * @return UserDetailsService
+	 */
+//	@Bean
+//	public UserDetailsService users() {
+//		
+//		// user builder
+//		UserBuilder users = User.builder();
+//		
+//		// users
+//		UserDetails user = users.username("user").password("password").roles("USER").build();
+//		UserDetails admin = users.username("admin").password("password").roles("USER", "ADMIN").build();
+//
+//		return new InMemoryUserDetailsManager(user, admin);
+//	}
 
 //	@Autowired
 //    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -121,7 +133,7 @@ public class MyWebSecurityConfig {
 	@Bean
 	public AuthenticationProvider daoAuthenticationProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(users());
+		authProvider.setUserDetailsService(userDetailsManager);
 		authProvider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
 		return authProvider;
 	}
@@ -143,82 +155,29 @@ public class MyWebSecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
-		RequestCache nullRequestCache = new NullRequestCache();
-		
-		http
-	    .authenticationManager(providerManager())
-	    .csrf(t -> t.disable())
-	    .authorizeHttpRequests(
-	        
-	        (authorize) -> authorize
-	        .dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-	        .requestMatchers("/views/**","/static/**").permitAll()
-	        .requestMatchers("/h2**").permitAll()
-	        .requestMatchers("/home").permitAll()
-	        .anyRequest().permitAll()
-	    
-	    )
-	    .formLogin(form -> form.loginPage("/login")
-	                .defaultSuccessUrl("/home")
-	                .permitAll() 
-	    )
-	    .logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-	    .rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-	    .headers().frameOptions().disable(); // disabilitare le opzioni di sicurezza per i frame, che sono necessarie per l'H2-console.
-		
+		http	
 		.authenticationManager(providerManager())
 		.csrf(csrf -> csrf.disable())
 		.authorizeHttpRequests(
 				
 				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
+						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
+						.requestMatchers("/views/**", "/static/**").permitAll()
+						.requestMatchers(new RequestMatcher() {
 							
 							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
+							public boolean matches(HttpServletRequest request) {
 								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
+								 if ( request.getServletPath().contains("console") ) {
+									 return true;
+								 }
+								 
+								return false;
 							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
+						}).permitAll()
+						.requestMatchers("/console/**").permitAll()
+						.requestMatchers("/home").permitAll()
+						.anyRequest().authenticated()
 				)
 				.formLogin(
 						form -> form
@@ -238,331 +197,22 @@ public class MyWebSecurityConfig {
 							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 									Authentication authentication) throws IOException, ServletException {
 								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
+								try {
 									
-									// builder
+									userDetailsManager.loadUserByUsername(authentication.getName());
+									
+								} catch (UsernameNotFoundException e) {
+
+									// user builder
 									UserBuilder users = User.builder();
 									
+									// create user
 									UserDetails newUser = users.username(authentication.getName()).build();
 									
+									// save user
+									userDetailsManager.createUser(newUser);
 								}
-							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
 								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
-							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
-								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
-							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
-								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
-							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
-								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
-							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
-								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
-							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
-								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
-							}
-						})
-				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
-				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
-		
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR)
-						.permitAll().requestMatchers("/views/**", "/static/**").permitAll().requestMatchers("/h2**")
-						.hasRole("ADMIN").requestMatchers("/home").permitAll().anyRequest().authenticated()
-				)
-				.formLogin(
-						form -> form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.permitAll()
-				)
-				.oauth2Login(o -> o
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
-								
-								UserDetails userDetails = users().loadUserByUsername(authentication.getName());
-								
-								if ( userDetails == null || userDetails.getUsername() == null || userDetails.getUsername().isBlank() ) {
-									
-									// builder
-									UserBuilder users = User.builder();
-									
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-								}
 							}
 						})
 				)
@@ -577,7 +227,7 @@ public class MyWebSecurityConfig {
 	@Bean
 	RememberMeServices rememberMeServices() {
 		RememberMeTokenAlgorithm encodingAlgorithm = RememberMeTokenAlgorithm.SHA256;
-		TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices("myKey", users(), encodingAlgorithm);
+		TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices("myKey", userDetailsManager, encodingAlgorithm);
 		rememberMe.setMatchingAlgorithm(RememberMeTokenAlgorithm.MD5);
 		return rememberMe;
 	}
