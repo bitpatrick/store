@@ -24,9 +24,12 @@ CREATE TABLE regulations (
 
 CREATE TABLE orders (
     id INT AUTO_INCREMENT,
+    username VARCHAR_IGNORECASE(50),
     total_qty INT,
     total_price DECIMAL(10,2),
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(username) REFERENCES users(username)
+
 );
 
 CREATE TABLE orders_products (
