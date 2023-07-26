@@ -8,13 +8,19 @@ import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import it.bitprojects.store.dto.BalanceDto;
 import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.Purchase;
+import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Cart;
+import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.model.Product;
 import it.bitprojects.store.repository.Warehouse;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -66,9 +72,8 @@ public class Maximo implements StoreService {
 		return warehouse.getAll(Product.class).stream()
 				.map(p -> new ProductDto(p.getId(), p.getName(), p.getCategory(), p.getPrice())).toList();
 	}
-	
-	
-	//TODO A
+
+	// TODO A
 	@Override
 	public List<ProductInStockDto> getProductsInStock() {
 		return warehouse.getProductsInStock();
@@ -102,14 +107,33 @@ public class Maximo implements StoreService {
 
 	@Override
 	public int getNumeroFile() {
-		
+
 		return warehouse.getNumeroFile();
 	}
 
 	@Override
 	public void saveFile(String fileName) {
 		warehouse.saveFile(fileName);
+
+	}
+
+	@Override
+	public BalanceDto incrementBalance(Currency currencyEnum, Integer quantity) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		String username = userDetails.getUsername();
 		
+		
+		Balance balance = warehouse.getBalance(username);
+		
+		balance.increment(currencyEnum,quantity);
+		
+		warehouse.updateQty(username,);
+		
+
+		return null;
 	}
 
 }

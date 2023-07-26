@@ -29,7 +29,14 @@ CREATE TABLE orders (
     total_price DECIMAL(10,2),
     PRIMARY KEY(id),
     FOREIGN KEY(username) REFERENCES users(username)
+);
 
+CREATE TABLE balances (
+    username VARCHAR_IGNORECASE(50),
+	currency VARCHAR_IGNORECASE(3),
+    quantity DECIMAL(10,2),
+    PRIMARY KEY(username),
+    FOREIGN KEY(username) REFERENCES users(username)
 );
 
 CREATE TABLE orders_products (

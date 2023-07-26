@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.exceptions.ProductNotAvailableException;
+import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Category;
 import it.bitprojects.store.model.Order;
 import it.bitprojects.store.model.Product;
@@ -213,5 +214,11 @@ public class Warehouse implements Stock {
 		String query = "INSERT INTO file_name (name) VALUES(?)";
 		jdbcTemplate.update(query, fileName);
 	}
+
+	public Balance getBalance(String username) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
