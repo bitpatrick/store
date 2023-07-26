@@ -240,6 +240,7 @@ public class MyWebSecurityConfig {
 				
 				
 				.oauth2Login(o -> o
+						
 						.loginProcessingUrl("/login/oauth2")
 						.clientRegistrationRepository(clientRegistrationRepository)
 						.authorizedClientService(oAuth2AuthorizedClientService)
@@ -270,8 +271,14 @@ public class MyWebSecurityConfig {
 							}
 						})
 				)
-				.logout((logout) -> logout.logoutSuccessUrl("/home").permitAll())
+				
+				.logout((logout) -> 
+				logout.logoutSuccessUrl("/home")
+				.permitAll()
+				)
+				
 				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
+				
 				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
 																		// frame, che sono necessarie per l'H2-console.
 
@@ -280,9 +287,11 @@ public class MyWebSecurityConfig {
 	
 	@Bean
 	RememberMeServices rememberMeServices() {
+		
 		RememberMeTokenAlgorithm encodingAlgorithm = RememberMeTokenAlgorithm.SHA256;
 		TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices("myKey", userDetailsManager, encodingAlgorithm);
 		rememberMe.setMatchingAlgorithm(RememberMeTokenAlgorithm.MD5);
+		
 		return rememberMe;
 	}
 
