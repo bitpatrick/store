@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.nimbusds.jose.proc.SecurityContext;
+
 import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.service.StoreService;
@@ -46,6 +48,7 @@ public class MainController {
 		// aggiungo i prodotti al modello
 		model.addAttribute("products", products);
 		model.addAttribute("productsInCart", productsInCart);
+		
 
 		// il modello verrà reindirizzato alla view
 		return "home";
