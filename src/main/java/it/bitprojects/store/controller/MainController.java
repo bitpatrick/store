@@ -3,11 +3,19 @@ package it.bitprojects.store.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,10 +39,12 @@ public class MainController {
 
 	@Autowired
 	private StoreService store;
-
+	
+	@Autowired
+	private MessageSource messageSource;
 
 	@GetMapping("/home")
-	public String home(Model model) {
+	public String home(Model model, @AuthenticationPrincipal UserDetails user, Locale locale) {
 
 		// recupero carrello
 		Cart cart = this.cartProvider.get();
@@ -48,7 +58,8 @@ public class MainController {
 		// aggiungo i prodotti al modello
 		model.addAttribute("products", products);
 		model.addAttribute("productsInCart", productsInCart);
-		
+		model.addAttribute("locales", Arrays.asList(Locale.ENGLISH, Locale.ITALIAN) );
+		model.addAttribute("username", ( user != null ) ? user.getUsername() : messageSource.getMessage("username.unknown", null, locale));	
 
 		// il modello verrà reindirizzato alla view
 		return "home";

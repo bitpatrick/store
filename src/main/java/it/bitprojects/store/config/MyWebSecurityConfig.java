@@ -203,7 +203,7 @@ public class MyWebSecurityConfig {
 						}).permitAll()
 						.requestMatchers("/home").permitAll()
 						.requestMatchers("/login**").permitAll()
-						.anyRequest().authenticated()
+						.anyRequest().permitAll()
 				)
 		
 				// aggiunge automaticamente il filtro UsernamePasswordAuthenticationFilter

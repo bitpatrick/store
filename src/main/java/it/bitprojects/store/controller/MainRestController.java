@@ -6,16 +6,20 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +42,9 @@ import net.sf.jasperreports.engine.JRException;
 @RestController
 @RequestMapping("/api")
 public class MainRestController implements ServletContextAware {
+
+	@Autowired
+	private MessageSource messageSource;
 
 	@Autowired
 	private StoreService storeService;
@@ -202,5 +209,17 @@ public class MainRestController implements ServletContextAware {
 		BalanceDto balanceDto = storeService.incrementBalance(currencyEnum, quantity);
 
 		return ResponseEntity.ok(balanceDto);
+	}
+
+	@GetMapping("/test1")
+	public String handleRequest1(Locale locale) {
+		return String.format("Request received. Language: %s, Country: %s %n", locale.getLanguage(),
+				locale.getDisplayCountry());
+	}
+
+	@GetMapping("/test2")
+	public String handleRequest2(@AuthenticationPrincipal UserDetails user, Locale locale) {
+
+		return messageSource.getMessage("app.name", new Object[] { user.getUsername() }, locale);
 	}
 }

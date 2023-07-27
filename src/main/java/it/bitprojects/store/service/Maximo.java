@@ -130,7 +130,7 @@ public class Maximo implements StoreService {
 		
 		balance.increment(currencyEnum,quantity);
 		
-		warehouse.updateQty(username,);
+//		warehouse.updateQty(username,);
 		
 
 		return null;

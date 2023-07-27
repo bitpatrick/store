@@ -1,9 +1,11 @@
 package it.bitprojects.store.config;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ViewResolver;
@@ -14,6 +16,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
@@ -72,9 +75,33 @@ public class MyWebConfig implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(new PippoInterceptorHandler());
 		registry.addInterceptor(new IPLoggingInterceptorHandler());
+
+		// HandlerInterceptor
+		LocaleChangeInterceptor localeChangeInterceptor = new LocaleChangeInterceptor();
+		localeChangeInterceptor.setParamName("localeCode");
+		registry.addInterceptor(localeChangeInterceptor);
+
 		WebMvcConfigurer.super.addInterceptors(registry);
 	}
+	
+//	@Bean
+//    public LocaleResolver localeResolver () {
+//        CookieLocaleResolver r = new CookieLocaleResolver();
+//        r.setDefaultLocale(Locale.US);
+//        r.setCookieName("localeInfo");
+//
+//        //if set to -1, the cookie is deleted
+//        // when browser shuts down
+//        r.setCookieMaxAge(24*60*60);
+//        return r;
+//    }
 
+	@Bean
+	public MessageSource messageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasenames("messages");
+		return messageSource;
+	}
 
 //	@Bean
 //	public JsonMapper jsonMapper() {

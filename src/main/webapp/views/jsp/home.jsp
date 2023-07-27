@@ -26,6 +26,7 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 </head>
 <body>
+
 	<jsp:include page="navbar.jsp" />
 	
 	<!-- ADDED PRODUCT MODAL -->
@@ -112,7 +113,11 @@
 	</div>
 	
 	<!-- CONTAINER -->
-	<div class="container mt-5">
+	<div class="container mt-5 text-center">
+	
+		<div class="row">
+    		<div class="col-12"><h1><spring:message code="app.name" arguments="${username}"/></h1></div>
+    	</div>
 		<!-- FIRST ROW -->
 		<div class="row">
 			<c:forEach var="product" items="${products}">
@@ -305,6 +310,23 @@
 	$('#successModal').on('hidden.bs.modal', function (e) {
 	  // quando la modale viene chiusa, ricarica la pagina
 	  window.location.reload();
+	});
+	
+	
+	$(".dropdown-item").click(function(event){
+        event.preventDefault();  // Evita il comportamento predefinito del click
+
+        var locale = $(this).data('locale');  // Ottiene il valore di data-locale
+
+        $.ajax({
+            url: '${pageContext.servletContext.contextPath}/home',  // URL del tuo endpoint
+            method: 'GET',  // Metodo HTTP
+            data: { 'localeCode': locale },  // Parametri della richiesta
+            success: function(response) {
+                // Aggiorna la pagina o fai qualcosa con la risposta
+            	window.location.reload();
+            }
+        });
 	});
 	
 </script>
