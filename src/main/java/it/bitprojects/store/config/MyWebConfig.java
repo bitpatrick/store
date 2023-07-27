@@ -1,5 +1,7 @@
 package it.bitprojects.store.config;
 
+import java.util.Locale;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -8,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -16,7 +19,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistration;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
@@ -84,18 +89,26 @@ public class MyWebConfig implements WebMvcConfigurer {
 		WebMvcConfigurer.super.addInterceptors(registry);
 	}
 	
-//	@Bean
-//    public LocaleResolver localeResolver () {
-//        CookieLocaleResolver r = new CookieLocaleResolver();
-//        r.setDefaultLocale(Locale.US);
-//        r.setCookieName("localeInfo");
-//
-//        //if set to -1, the cookie is deleted
-//        // when browser shuts down
-//        r.setCookieMaxAge(24*60*60);
-//        return r;
-//    }
+	@Bean
+    public LocaleResolver localeResolver () {
+        CookieLocaleResolver r = new CookieLocaleResolver();
+        r.setDefaultLocale(Locale.ENGLISH);
+        r.setCookieName("localeInfo");
 
+        //if set to -1, the cookie is deleted
+        // when browser shuts down
+        r.setCookieMaxAge(24*60*60);
+        return r;
+    }
+	
+//	@Bean
+//	public LocaleResolver localeResolver () {
+//		
+//		SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
+//		
+//		return sessionLocaleResolver;
+//	}
+	
 	@Bean
 	public MessageSource messageSource() {
 		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
