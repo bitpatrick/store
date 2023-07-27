@@ -21,54 +21,49 @@
 	</properties>
 
 	<dependencies>
-		
+
 		<dependency>
-		  <groupId>org.springframework.security</groupId>
-		  <artifactId>spring-security-oauth2-client</artifactId>
-		  <version>6.1.1</version>
-		  <scope>compile</scope>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-client</artifactId>
+			<version>6.1.1</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
-		  <groupId>org.springframework.security</groupId>
-		  <artifactId>spring-security-oauth2-jose</artifactId>
-		  <version>6.1.1</version>
-		  <scope>compile</scope>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-jose</artifactId>
+			<version>6.1.1</version>
+			<scope>compile</scope>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.glassfish.hk2.external/javax.inject -->
+		<!-- https://mvnrepository.com/artifact/org.glassfish.hk2.external/javax.inject -->
 		<dependency>
 			<groupId>jakarta.inject</groupId>
 			<artifactId>jakarta.inject-api</artifactId>
 			<version>2.0.0</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-core -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<version>6.1.1</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.security/spring-security-web -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-web -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 			<version>6.1.1</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.security/spring-security-config -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-config -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
 			<version>6.1.1</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
+		<!-- https://mvnrepository.com/artifact/net.sf.jasperreports/jasperreports -->
 		<!-- fare report -->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
@@ -76,8 +71,7 @@
 			<version>6.20.5</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
+		<!-- https://mvnrepository.com/artifact/jakarta.servlet/jakarta.servlet-api -->
 		<dependency>
 			<groupId>
 				jakarta.servlet</groupId>
@@ -87,8 +81,7 @@
 				provided</scope>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>
@@ -96,8 +89,7 @@
 			<version>6.0.7</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api -->
+		<!-- https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api -->
 		<dependency>
 			<groupId>
 				jakarta.servlet.jsp.jstl</groupId>
@@ -106,8 +98,7 @@
 				3.0.0</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
+		<!-- https://mvnrepository.com/artifact/org.glassfish.web/jakarta.servlet.jsp.jstl -->
 		<dependency>
 			<groupId>org.glassfish.web</groupId>
 			<artifactId>
@@ -115,8 +106,7 @@
 			<version>3.0.1</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 		<dependency>
 			<groupId>
 				com.fasterxml.jackson.core</groupId>
@@ -134,8 +124,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
 		<dependency>
 			<groupId>
 				org.mockito</groupId>
@@ -181,8 +170,21 @@
 			<version>6.0.9</version>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
+
+		<dependency>
+			<groupId>javax.money</groupId>
+			<artifactId>money-api</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+<dependency>
+    <groupId>org.javamoney</groupId>
+    <artifactId>moneta</artifactId>
+    <version>1.4.2</version>
+    <type>pom</type>
+</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-taglibs</artifactId>
@@ -190,26 +192,25 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
-		<!--		<dependency>-->
-		<!--			<groupId>javax.servlet</groupId>-->
-		<!--			<artifactId>javax.servlet-api</artifactId>-->
-		<!--			<version>4.0.1</version>-->
-		<!--		</dependency>-->
+		<!-- <dependency> -->
+		<!-- <groupId>javax.servlet</groupId> -->
+		<!-- <artifactId>javax.servlet-api</artifactId> -->
+		<!-- <version>4.0.1</version> -->
+		<!-- </dependency> -->
 
 	</dependencies>
 
 	<build>
 		<finalName>
 			store</finalName>
-		<pluginManagement><!-- lock down plugins versions to avoid using Maven
-			defaults (may be moved to parent pom) -->
+		<pluginManagement><!-- lock down plugins versions to avoid using Maven 
+				defaults (may be moved to parent pom) -->
 			<plugins>
 				<plugin>
 					<artifactId>maven-clean-plugin</artifactId>
 					<version>3.1.0</version>
 				</plugin>
-				<!-- see
-				http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
+				<!-- see http://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_war_packaging -->
 				<plugin>
 					<artifactId>
 						maven-resources-plugin</artifactId>

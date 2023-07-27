@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.BalanceDto;
@@ -18,10 +17,11 @@ import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.Purchase;
+import it.bitprojects.store.exceptions.ProductNotAvailableException;
 import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Cart;
-import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.model.Product;
+import it.bitprojects.store.repository.BalanceRepositoryImplementation;
 import it.bitprojects.store.repository.Warehouse;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -32,7 +32,10 @@ public class Maximo implements StoreService {
 
 	@Autowired
 	private Warehouse warehouse;
-
+	
+	@Autowired
+	private BalanceRepositoryImplementation balanceRepositoryImplementation;
+	
 	@Autowired
 	private Report report;
 
@@ -82,8 +85,16 @@ public class Maximo implements StoreService {
 	@Override
 	public void addProductToCart(int idProduct, int qty, Cart cart) {
 
-		// decurta qta prodotto dal magazzino
-		this.warehouse.reduceQty(idProduct, qty);
+		// decurta qta prodotto dal magazzino;
+		int qtyInStock = warehouse.getQtyInStock(idProduct);
+
+		if (qtyInStock < qty) {
+			throw new ProductNotAvailableException();
+		}
+
+		int newQtyInStock = qtyInStock - qty;
+
+		warehouse.updateQty(idProduct, newQtyInStock);
 
 		// recupera scheda prodotto
 		Product product = this.warehouse.getById(idProduct, Product.class);
@@ -101,7 +112,9 @@ public class Maximo implements StoreService {
 		cart.removeProduct(idProduct, qty);
 
 		// se tutto è andato bene verrà aggiornato lo stock e finisce
-		this.warehouse.incrementQty(idProduct, qty);
+		int newQty = warehouse.getQtyInStock(idProduct) + qty;
+
+		this.warehouse.updateQty(idProduct, newQty);
 
 	}
 
@@ -118,22 +131,33 @@ public class Maximo implements StoreService {
 	}
 
 	@Override
-	public BalanceDto incrementBalance(Currency currencyEnum, Integer quantity) {
+	public BalanceDto getBalance() {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-		String username = userDetails.getUsername();
+		String username = authentication.getName();
 		
+		Balance balance = balanceRepositoryImplementation.getBalance(username);
 		
-		Balance balance = warehouse.getBalance(username);
-		
-		balance.increment(currencyEnum,quantity);
-		
-		warehouse.updateQty(username,);
-		
-
 		return null;
 	}
+
+//	@Override
+//	public BalanceDto incrementBalance(Currency currencyEnum, Integer quantity) {
+//
+//		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//		String username = userDetails.getUsername();
+//		
+//		
+//		Balance balance = warehouse.getBalance(username);
+//		
+//		balance.increment(currencyEnum,quantity);
+//		
+//		warehouse.updateQty(username,);
+//		
+//
+//		return null;
+//	}
 
 }

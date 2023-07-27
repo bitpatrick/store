@@ -31,13 +31,9 @@ CREATE TABLE orders (
     FOREIGN KEY(username) REFERENCES users(username)
 );
 
-CREATE TABLE balances (
-    username VARCHAR_IGNORECASE(50),
-	currency VARCHAR_IGNORECASE(3),
-    quantity DECIMAL(10,2),
-    PRIMARY KEY(username),
-    FOREIGN KEY(username) REFERENCES users(username)
-);
+ALTER TABLE Users ADD country VARCHAR(100);
+ALTER TABLE Users ADD token_qty DOUBLE;
+ALTER TABLE Users ADD currency VARCHAR(10);
 
 CREATE TABLE orders_products (
     order_id INT,

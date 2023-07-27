@@ -19,11 +19,10 @@ import org.springframework.stereotype.Repository;
 
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.ProductInStockDto;
-import it.bitprojects.store.exceptions.ProductNotAvailableException;
-import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Category;
 import it.bitprojects.store.model.Order;
 import it.bitprojects.store.model.Product;
+import it.bitprojects.store.response.GeoLocationResponse;
 
 @Repository
 public class Warehouse implements Stock {
@@ -124,49 +123,32 @@ public class Warehouse implements Stock {
 		return products;
 	}
 
-	/**
-	 * con questo metodo tolgo quantita del prodotto e poi chiamo il metodo per
-	 * aggiornare
-	 */
-	public void reduceQty(int idProduct, int qty) {
+	public int getQtyInStock(int idProduct) {
 
-		String selectSql = "SELECT qty FROM stocks WHERE id_product = " + idProduct + " AND qty >= " + qty;
+		String selectSql = "SELECT qty FROM stocks WHERE id_product = " + idProduct;
 
-		int qtyInStock;
+		int qtyInStock = 0;
+
 		try {
 
 			qtyInStock = jdbcTemplate.queryForObject(selectSql, Integer.class);
 
-		} catch (Exception e) {
-
-			qtyInStock = 0;
+		} catch (Exception ignored) {
 		}
 
-		int newQty = qtyInStock - qty;
-
-		if (newQty < 0) {
-
-			throw new ProductNotAvailableException();
-		}
-		updateQty(idProduct, newQty);
+		return qtyInStock;
 
 	}
+
+	/**
+	 * con questo metodo tolgo quantita del prodotto e poi chiamo il metodo per
+	 * aggiornare
+	 */
 
 	/**
 	 * devo fare metodo per aumentare la quantita e poi aggiornarla di nuovo nello
 	 * stock
 	 */
-
-	public void incrementQty(int idProduct, int qty) {
-		String selectSql = "SELECT qty FROM stocks WHERE id_product = " + idProduct;
-
-		int qtyInStock = jdbcTemplate.queryForObject(selectSql, Integer.class);
-
-		int newQty = qtyInStock + qty;
-
-		updateQty(idProduct, newQty);
-
-	}
 
 	@Override
 	public void updateQty(int idProduct, int newQty) {
@@ -215,10 +197,11 @@ public class Warehouse implements Stock {
 		jdbcTemplate.update(query, fileName);
 	}
 
-	public Balance getBalance(String username) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public void updateUserLocalization(String username, GeoLocationResponse geoLocationResponse) {
+		
+		String query = "UPDATE USERS SET country = ? , currency= ? WHERE username = ? ";
+		jdbcTemplate.update(query, geoLocationResponse.getCountry(), geoLocationResponse.getCurrency(), username);
 
+	}
 
 }

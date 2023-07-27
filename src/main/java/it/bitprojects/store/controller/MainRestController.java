@@ -17,19 +17,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.ServletContextAware;
 
 import it.bitprojects.store.dto.BalanceDto;
 import it.bitprojects.store.dto.MessageDto;
 import it.bitprojects.store.dto.ProductInStockDto;
-import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.service.StoreService;
 import it.bitprojects.store.utility.FileService;
 import jakarta.servlet.ServletContext;
@@ -59,7 +56,8 @@ public class MainRestController implements ServletContextAware {
 	 * @param idProduct
 	 * @param qty
 	 */
-
+	
+	
 	@GetMapping(value = "/catalogo", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<ProductInStockDto> getAllProductsInStock() {
 		/*
@@ -68,6 +66,16 @@ public class MainRestController implements ServletContextAware {
 		List<ProductInStockDto> productsDto = storeService.getProductsInStock();
 
 		return productsDto;
+	}
+	
+	
+	@GetMapping(value = "/balance", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<BalanceDto> getBalance(){
+		
+		
+		BalanceDto balanceDto = storeService.getBalance();
+
+		return ResponseEntity.ok(balanceDto); 
 	}
 
 	@GetMapping(value = "/products-in-stock", produces = MediaType.APPLICATION_PDF_VALUE)
@@ -187,20 +195,4 @@ public class MainRestController implements ServletContextAware {
 		return ResponseEntity.ok("hello");
 	}
 
-	@GetMapping("/home/wallet/{currency}")
-	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<BalanceDto> incrementBalance(@PathVariable("currency") String currency,
-			@RequestParam("quantity") Integer quantity) {
-
-		Currency currencyEnum = null;
-		try {
-			currencyEnum = Currency.valueOf(currency.toUpperCase());
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		}
-
-		BalanceDto balanceDto = storeService.incrementBalance(currencyEnum, quantity);
-
-		return ResponseEntity.ok(balanceDto);
-	}
 }

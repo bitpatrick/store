@@ -10,7 +10,6 @@ import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.Purchase;
 import it.bitprojects.store.model.Cart;
-import it.bitprojects.store.model.Currency;
 import net.sf.jasperreports.engine.JRException;
 
 public interface StoreService {
@@ -31,6 +30,6 @@ public interface StoreService {
 
 	public void saveFile(String fileName);
 
-	public BalanceDto incrementBalance(Currency currencyEnum, Integer quantity);
+	public BalanceDto getBalance();
 
-}
+	}

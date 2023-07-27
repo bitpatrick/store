@@ -1,7 +1,6 @@
 package it.bitprojects.store.dto;
 
-import it.bitprojects.store.model.Currency;
+import javax.money.CurrencyUnit;
 
-public record BalanceDto(Currency currency, double quantity) {
-
+public record BalanceDto(double tokenQty,CurrencyUnit currency,double currencyQty) {
 }
