@@ -5,4 +5,3 @@ import java.util.Map;
 public record Purchase( Map<Integer, Integer> products)  {
 
 }
- 
