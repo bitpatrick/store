@@ -2,12 +2,15 @@ package it.bitprojects.store.controller;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+
+import javax.money.NumberValue;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -17,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,6 +77,18 @@ public class MainRestController implements ServletContextAware {
 		BalanceDto balanceDto = storeService.getBalance();
 
 		return ResponseEntity.ok(balanceDto);
+	}
+	
+	
+	/**
+	 * La currency deve rimanere salvata in pagina
+	 * @param tokenQty
+	 * @return
+	 */
+	@GetMapping(value = "/tokens-price/{tokenQty}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<NumberValue> getTokensPrice(@PathVariable("tokenQty") double tokenQty) {
+
+		return ResponseEntity.ok(storeService.getTokensPrice(tokenQty));
 	}
 
 	@GetMapping(value = "/products-in-stock", produces = MediaType.APPLICATION_PDF_VALUE)

@@ -17,6 +17,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
+import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Cart;
 
 @EnableWebMvc
@@ -66,6 +67,11 @@ public class MyWebConfig implements WebMvcConfigurer {
 	@Scope(WebApplicationContext.SCOPE_SESSION)
 	public Cart cart() {
 		return new Cart();
+	}
+	
+	@Bean
+	public Balance balance() {
+		return new Balance();
 	}
 
 	@Override

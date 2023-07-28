@@ -49,7 +49,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import it.bitprojects.store.service.UserLocalizationService;
+import it.bitprojects.store.service.UserService;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,7 +67,7 @@ public class MyWebSecurityConfig {
 	private UserDetailsManager userDetailsManager;
 
 	@Autowired
-	private UserLocalizationService userlocalizationService;
+	private UserService userlocalizationService;
 
 	/**
 	 * crea utenti in memoria
@@ -224,7 +224,7 @@ public class MyWebSecurityConfig {
 									}
 								})
 								.successHandler(
-										new UserlocalizationAuthenticationSuccessHandler(this.userlocalizationService))
+										new UserAuthenticationSuccessHandler(this.userlocalizationService))
 								.permitAll()
 
 				)

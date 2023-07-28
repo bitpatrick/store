@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.money.NumberValue;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,7 @@ import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.model.Product;
 import it.bitprojects.store.repository.BalanceRepositoryImplementation;
 import it.bitprojects.store.repository.Warehouse;
+import jakarta.inject.Provider;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -38,6 +41,10 @@ public class Maximo implements StoreService {
 	
 	@Autowired
 	private Report report;
+	
+	@Autowired
+	private Provider<Balance> balanceProvider;
+	
 
 	@Override
 	public Number purchase(Purchase purchase) {
@@ -133,12 +140,17 @@ public class Maximo implements StoreService {
 	@Override
 	public BalanceDto getBalance() {
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName();
+		Balance balance = balanceProvider.get();
 		
-		Balance balance = balanceRepositoryImplementation.getBalance(username);
+		return new BalanceDto(balance.getTokenQty(), balance.getCurrency(), balance.getCurrencyQty());
+	}
+
+	
+	//TODO 
+	@Override
+	public NumberValue getTokensPrice(double tokenQty) {
 		
-		return null;
+		return balanceProvider.get().getTokensPrice(tokenQty);
 	}
 
 //	@Override

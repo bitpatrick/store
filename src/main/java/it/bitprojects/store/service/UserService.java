@@ -6,18 +6,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import it.bitprojects.store.model.Balance;
+import it.bitprojects.store.repository.BalanceRepositoryImplementation;
 import it.bitprojects.store.repository.Warehouse;
 import it.bitprojects.store.response.GeoLocationResponse;
+import jakarta.inject.Provider;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Service
-public class UserLocalizationService {
+public class UserService {
 
 	@Autowired
 	private Warehouse warehouse;
+	
+	@Autowired
+	private BalanceRepositoryImplementation balanceRepositoryImplementation;
+	
+	@Autowired
+	private Provider<Balance> balanceProvider;
+	
 
 	private final String GEO_LOCATION_API_URL = "http://ip-api.com/json/";
-	private final String IP_DEFAULT = "2.32.163.10";
+	private final String IP_DEFAULT = "24.48.0.1";
 
 	private GeoLocationResponse getLocationByIp(String ipAddress) {
 
@@ -32,7 +42,7 @@ public class UserLocalizationService {
 		return response;
 	}
 
-	public void updateUserLocalization(HttpServletRequest request, Authentication authentication) {
+	public void initializeUser(HttpServletRequest request, Authentication authentication) {
 
 		GeoLocationResponse geoLocationResponse = getLocationByIp(request.getRemoteAddr());
 
@@ -41,6 +51,8 @@ public class UserLocalizationService {
 		String username = userDetails.getUsername();
 
 		warehouse.updateUserLocalization(username, geoLocationResponse);
+		
+		balanceRepositoryImplementation.initializeBalance(balanceProvider.get(),username);
 
 	}
 

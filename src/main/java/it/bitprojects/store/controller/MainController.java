@@ -26,6 +26,8 @@ public class MainController {
 
 	@Autowired
 	private Provider<Cart> cartProvider;
+	
+	
 
 	@Autowired
 	private StoreService store;

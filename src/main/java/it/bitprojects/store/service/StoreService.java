@@ -3,6 +3,8 @@ package it.bitprojects.store.service;
 import java.nio.file.Path;
 import java.util.List;
 
+import javax.money.NumberValue;
+
 import org.springframework.core.io.Resource;
 
 import it.bitprojects.store.dto.BalanceDto;
@@ -31,5 +33,7 @@ public interface StoreService {
 	public void saveFile(String fileName);
 
 	public BalanceDto getBalance();
+
+	public NumberValue getTokensPrice(double tokenQty);
 
 	}
