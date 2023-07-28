@@ -23,6 +23,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 @ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
 		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
 public class AppConfig {
+	
+	
 
 	@Bean
 	public UserDetailsManager userDetailsManager() {

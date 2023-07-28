@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -18,8 +19,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +36,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.ServletContextAware;
 
+import it.bitprojects.store.config.JwtUtils;
 import it.bitprojects.store.dto.BalanceDto;
+import it.bitprojects.store.dto.LoginRequest;
+import it.bitprojects.store.dto.LoginResponse;
 import it.bitprojects.store.dto.MessageDto;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.model.Currency;
@@ -191,7 +200,7 @@ public class MainRestController implements ServletContextAware {
 	@GetMapping("hello")
 	public ResponseEntity<String> helloWorld() {
 
-		return ResponseEntity.ok("hello");
+		return ResponseEntity.ok("Hello World!");
 	}
 
 	@GetMapping("/home/wallet/{currency}")
@@ -222,4 +231,33 @@ public class MainRestController implements ServletContextAware {
 
 		return messageSource.getMessage("app.name", new Object[] { user.getUsername() }, locale);
 	}
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private JwtUtils jwtUtils;
+	
+	/**
+	 * ENDPOINT di LOGIN
+	 * 
+	 * @param loginRequest
+	 * @return ResponseEntity
+	 */
+	@PostMapping("/login")
+	public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
+		
+		
+		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+		
+		SecurityContextHolder.getContext().setAuthentication(authentication); 
+		
+		String jwt = jwtUtils.generateJwtToken(authentication);
+		
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).toList();
+		
+		return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername(), roles));
+	}
+	
 }

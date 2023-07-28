@@ -75,8 +75,8 @@ public class Warehouse implements Stock {
 
 		try {
 			// Utilizziamo jdbcTemplate per fare una query al database
-			return jdbcTemplate.queryForObject("SELECT * FROM " + tableName + " WHERE ID = ?",
-					new BeanPropertyRowMapper<>(type), id);
+			return jdbcTemplate.queryForObject("SELECT * FROM " + tableName + " WHERE ID = ?", new BeanPropertyRowMapper<>(type), id);
+		
 		} catch (EmptyResultDataAccessException e) {
 			// Se la query non ha restituito alcun risultato, ritorniamo null
 			return null;

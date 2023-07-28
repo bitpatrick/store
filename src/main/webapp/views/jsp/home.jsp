@@ -312,7 +312,6 @@
 	  window.location.reload();
 	});
 	
-	
 	$(".dropdown-item").click(function(event){
         event.preventDefault();  // Evita il comportamento predefinito del click
 
