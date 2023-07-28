@@ -1,7 +1,5 @@
 package it.bitprojects.store.model;
 
-import java.util.Currency;
-
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
@@ -11,24 +9,22 @@ import javax.money.convert.ExchangeRateProvider;
 import javax.money.convert.MonetaryConversions;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 public class Balance {
 
 	private final int TOKEN_EUR_PRICE = 1;
 
 	private NumberValue tokenQty;
 	private CurrencyUnit currency;
-	private NumberValue currencyQty;
+//	private NumberValue currencyQty;
 	
 	
 	public Balance(NumberValue tokenQty, CurrencyUnit currency) {
 		this.tokenQty = tokenQty;
 		this.currency = currency;
 		
-		this.currencyQty=calculateCurrencyQty();
+//		this.currencyQty=calculateCurrencyQty();
 	}
 
 

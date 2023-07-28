@@ -1,4 +1,4 @@
-INSERT INTO users (username, password, enabled) VALUES ('supermario', '{bcrypt}$2a$12$jAYTU4q6a7Os45R9oOlknuXloS0ElcOLHvyCvlDXUERCwvEl2JA8O', true);
+INSERT INTO users (username, password, enabled,token_qty,currency) VALUES ('supermario', '{bcrypt}$2a$12$jAYTU4q6a7Os45R9oOlknuXloS0ElcOLHvyCvlDXUERCwvEl2JA8O', true,1.5,'USD');
 INSERT INTO authorities (username, authority) VALUES ('supermario', 'ROLE_USER'); 
 
 INSERT INTO products (name, category, price) VALUES ('iphone', 'TELEPHONY', 10.99);

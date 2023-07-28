@@ -19,7 +19,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
-		"it.bitprojects.store.service", "it.bitprojects.store.listener","it.bitprojects.store.listener" })
+		"it.bitprojects.store.service", "it.bitprojects.store.listener", "it.bitprojects.store.listener" })
 public class AppConfig {
 
 	@Bean
@@ -47,10 +47,8 @@ public class AppConfig {
 	@Bean
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-				.addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION)
-				.addScript("classpath:jdbc/schema.sql")
-				.addScript("classpath:jdbc/test-data.sql")
-				.build();
+				.addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION).addScript("classpath:jdbc/schema.sql")
+				.addScript("classpath:jdbc/test-data.sql").build();
 	}
 
 	/**

@@ -56,8 +56,7 @@ public class MainRestController implements ServletContextAware {
 	 * @param idProduct
 	 * @param qty
 	 */
-	
-	
+
 	@GetMapping(value = "/catalogo", produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<ProductInStockDto> getAllProductsInStock() {
 		/*
@@ -67,15 +66,13 @@ public class MainRestController implements ServletContextAware {
 
 		return productsDto;
 	}
-	
-	
+
 	@GetMapping(value = "/balance", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<BalanceDto> getBalance(){
-		
-		
+	public ResponseEntity<BalanceDto> getBalance() {
+
 		BalanceDto balanceDto = storeService.getBalance();
 
-		return ResponseEntity.ok(balanceDto); 
+		return ResponseEntity.ok(balanceDto);
 	}
 
 	@GetMapping(value = "/products-in-stock", produces = MediaType.APPLICATION_PDF_VALUE)
