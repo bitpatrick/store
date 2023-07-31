@@ -16,6 +16,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -244,7 +245,7 @@ public class MainRestController implements ServletContextAware {
 	 * @param loginRequest
 	 * @return ResponseEntity
 	 */
-	@PostMapping("/login")
+	@PostMapping(value =  "/login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
 		
 		

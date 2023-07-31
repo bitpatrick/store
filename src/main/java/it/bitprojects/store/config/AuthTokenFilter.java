@@ -30,14 +30,27 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 		try {
 			
 			String jwt = parseJwt(request);
+			
+			/*
+			 * check if token is valid
+			 */
 			if ( jwt != null && jwtUtils.validateJwtToken(jwt) ) {
 				
-				String username = jwtUtils.getUserNameFromJwtToken(jwt);
+				// recupero username dal token
+				String username = jwtUtils.getUsernameFromJwtToken(jwt);
+				
+				// recupero username dal repository
 				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+				
+				// creo un token 
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-				authentication.setAuthenticated(true);
+
+				//	authentication.setAuthenticated(true);
+				
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				
 				SecurityContextHolder.getContext().setAuthentication(authentication);
+			
 			}
 			
 		} catch (Exception e) {

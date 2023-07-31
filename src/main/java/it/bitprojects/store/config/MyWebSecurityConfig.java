@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -45,6 +46,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -65,8 +67,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class MyWebSecurityConfig {
-	
-	
 	
 	@Autowired
 	private UserDetailsManager userDetailsManager;
@@ -288,7 +288,7 @@ public class MyWebSecurityConfig {
 	
 	@Bean
 	public JwtUtils jwtUtils() {
-		return new JwtUtils(userDetailsManager);
+		return new JwtUtils();
 	}
 	
 	@Bean
@@ -300,12 +300,26 @@ public class MyWebSecurityConfig {
 			.csrf(csrf -> csrf.disable())
 			.securityMatcher("/api/**")
 			.authorizeHttpRequests(r -> r
+					.requestMatchers("/api/login**").permitAll()
 					.anyRequest().authenticated()
 					)
 			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 					
 					)
-			.addFilterBefore(new AuthTokenFilter(new JwtUtils(userDetailsManager), userDetailsManager), UsernamePasswordAuthenticationFilter.class)
+			.exceptionHandling(e -> e
+					.authenticationEntryPoint(new AuthyEntryPointUnauthorizedJwt())
+					.accessDeniedHandler(new AccessDeniedHandler() {
+						
+						@Override
+						public void handle(HttpServletRequest request, HttpServletResponse response,
+								AccessDeniedException accessDeniedException) throws IOException, ServletException {
+							response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+							
+						}
+					})
+					)
+			
+			.addFilterBefore(new AuthTokenFilter(jwtUtils(), userDetailsManager), UsernamePasswordAuthenticationFilter.class)
 			;
 		
 		
@@ -322,7 +336,5 @@ public class MyWebSecurityConfig {
 		
 		return rememberMe;
 	}
-	
-	
 
 }

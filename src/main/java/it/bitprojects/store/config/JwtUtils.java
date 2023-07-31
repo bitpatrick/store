@@ -1,40 +1,32 @@
 package it.bitprojects.store.config;
 
-import java.util.Date;
+import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.UserDetailsManager;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class JwtUtils {
 
-	private UserDetailsManager userDetailsManager;
-
-	private static final String jwtSecret = "chiavesegreta123";
-
-	private static final Integer jwtExpirationMs = 864000000;
+	private static final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
 	public String generateJwtToken(Authentication authentication) {
 
 		UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
 
-		Date now = new Date();
-
-		String jwtToken = Jwts.builder().setSubject(userPrincipal.getUsername())
-				.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
+		String jwtToken = Jwts.builder().setSubject(userPrincipal.getUsername()).signWith(key).compact();
 
 		return jwtToken;
 	}
 
-	public String getUserNameFromJwtToken(String token) {
+	public String getUsernameFromJwtToken(String token) {
 
-		String usernameFromToken = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+		String usernameFromToken = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody().getSubject();
 
 		return usernameFromToken;
 	}
@@ -43,7 +35,7 @@ public class JwtUtils {
 
 		try {
 
-			Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+			Jwts.parser().setSigningKey(key).parseClaimsJws(authToken);
 			return true;
 
 		} catch (Exception e) {

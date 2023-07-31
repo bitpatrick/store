@@ -20,11 +20,8 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
-		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
+@ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository", "it.bitprojects.store.service", "it.bitprojects.store.listener" })
 public class AppConfig {
-	
-	
 
 	@Bean
 	public UserDetailsManager userDetailsManager() {
@@ -56,15 +53,21 @@ public class AppConfig {
 	}
 
 	/**
-	 * per fare le query
+	 * QUERY MANAGER
+	 * 
+	 * @param dataSource
+	 * @return JdbcTemplate
 	 */
 	@Bean
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
 	}
-
+	
 	/**
-	 * per le transazione, per renderla atomica
+	 * TRANSACTION MANAGER
+	 * 
+	 * @param dataSource
+	 * @return PlatformTransactionManager
 	 */
 	@Bean
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
