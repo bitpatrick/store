@@ -42,13 +42,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 				// recupero username dal repository
 				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 				
-				// creo un token 
+				// creo un token per la matriosca 
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-				//	authentication.setAuthenticated(true);
-				
+				// vari dettagli della request
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				
+				// setto il token all'interno della matriosca
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			
 			}

@@ -308,15 +308,6 @@ public class MyWebSecurityConfig {
 					)
 			.exceptionHandling(e -> e
 					.authenticationEntryPoint(new AuthyEntryPointUnauthorizedJwt())
-					.accessDeniedHandler(new AccessDeniedHandler() {
-						
-						@Override
-						public void handle(HttpServletRequest request, HttpServletResponse response,
-								AccessDeniedException accessDeniedException) throws IOException, ServletException {
-							response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
-							
-						}
-					})
 					)
 			
 			.addFilterBefore(new AuthTokenFilter(jwtUtils(), userDetailsManager), UsernamePasswordAuthenticationFilter.class)

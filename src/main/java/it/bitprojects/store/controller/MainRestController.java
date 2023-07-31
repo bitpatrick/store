@@ -198,12 +198,6 @@ public class MainRestController implements ServletContextAware {
 		return ResponseEntity.ok(stringhe);
 	}
 
-	@GetMapping("hello")
-	public ResponseEntity<String> helloWorld() {
-
-		return ResponseEntity.ok("Hello World!");
-	}
-
 	@GetMapping("/home/wallet/{currency}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<BalanceDto> incrementBalance(@PathVariable("currency") String currency,
@@ -248,17 +242,23 @@ public class MainRestController implements ServletContextAware {
 	@PostMapping(value =  "/login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
 		
-		
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 		
 		SecurityContextHolder.getContext().setAuthentication(authentication); 
 		
+		// token restituito
 		String jwt = jwtUtils.generateJwtToken(authentication);
 		
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).toList();
 		
 		return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername(), roles));
+	}
+	
+	@GetMapping("hello")
+	public ResponseEntity<String> helloWorld() {
+
+		return ResponseEntity.ok("Hello World!");
 	}
 	
 }
