@@ -2,11 +2,9 @@ package it.bitprojects.store.config;
 
 import javax.sql.DataSource;
 
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -18,9 +16,12 @@ import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository", "it.bitprojects.store.service", "it.bitprojects.store.listener" })
+@EnableTransactionManagement // abilita l'utilizzo dell'annotazione @Transactional
+@ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
+		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
 public class AppConfig {
 
 	@Bean
@@ -62,9 +63,14 @@ public class AppConfig {
 	public JdbcTemplate jdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
 	}
-	
+
 	/**
 	 * TRANSACTION MANAGER
+	 * 
+	 * abilita la possibilità di utilizzare le transazioni tramite xml
+	 * 
+	 * per abilitare le transazioni tramite @Transactional devo aggiungere
+	 * l'annotazione @EnableTransactionManagement alla mia classe @Configuration
 	 * 
 	 * @param dataSource
 	 * @return PlatformTransactionManager
@@ -73,7 +79,5 @@ public class AppConfig {
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
 		return new DataSourceTransactionManager(dataSource);
 	}
-
-	
 
 }
