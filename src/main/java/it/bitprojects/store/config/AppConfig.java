@@ -1,14 +1,19 @@
 package it.bitprojects.store.config;
 
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -75,9 +80,34 @@ public class AppConfig {
 	 * @param dataSource
 	 * @return PlatformTransactionManager
 	 */
+//	@Bean
+//	public PlatformTransactionManager transactionManager(DataSource dataSource) {
+//		return new DataSourceTransactionManager(dataSource);
+//	}
 	@Bean
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
-		return new DataSourceTransactionManager(dataSource);
+
+		JpaTransactionManager jtm = new JpaTransactionManager(entityManagerFactory().getObject());
+
+		return jtm;
+	}
+
+	@Bean
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+		em.setDataSource(dataSource());
+		em.setPackagesToScan(new String[] { "it.bitprojects.store.entities" }); // Specifica il package delle tue entità
+		em.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+
+		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+		em.setJpaVendorAdapter(vendorAdapter);
+//		 em.setJpaProperties(additionalProperties());
+		Properties properties = new Properties();
+		properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+
+		em.setJpaProperties(properties);
+
+		return em;
 	}
 
 }
