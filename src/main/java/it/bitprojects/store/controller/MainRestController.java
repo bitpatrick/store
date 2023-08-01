@@ -9,14 +9,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,9 +44,12 @@ import it.bitprojects.store.dto.LoginRequest;
 import it.bitprojects.store.dto.LoginResponse;
 import it.bitprojects.store.dto.MessageDto;
 import it.bitprojects.store.dto.ProductInStockDto;
+import it.bitprojects.store.entities.Address;
 import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.service.StoreService;
 import it.bitprojects.store.utility.FileService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.ServletContext;
 import net.sf.jasperreports.engine.JRException;
 
@@ -226,39 +230,75 @@ public class MainRestController implements ServletContextAware {
 
 		return messageSource.getMessage("app.name", new Object[] { user.getUsername() }, locale);
 	}
-	
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	private JwtUtils jwtUtils;
-	
+
 	/**
 	 * ENDPOINT di LOGIN
 	 * 
 	 * @param loginRequest
 	 * @return ResponseEntity
 	 */
-	@PostMapping(value =  "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<LoginResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
-		
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-		
-		SecurityContextHolder.getContext().setAuthentication(authentication); 
-		
+
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+
 		// token restituito
 		String jwt = jwtUtils.generateJwtToken(authentication);
-		
+
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority()).toList();
-		
+
 		return ResponseEntity.ok(new LoginResponse(jwt, userDetails.getUsername(), roles));
 	}
-	
+
 	@GetMapping("hello")
 	public ResponseEntity<String> helloWorld() {
 
 		return ResponseEntity.ok("Hello World!");
 	}
+
+//	 // posso usare quest'annotazione perché ho definito un container
+//						// :LocalContainerEntityManagerFactoryBean
+//	// mi permette di prendere il manager
+//	@PersistenceContext
+//	private EntityManager em;
+//
+////	@PostMapping("/address")
+//	@Transactional
+//	public void insertAddress(@RequestBody Address address) {
+//		em.persist(address);
+//
+//	}
+	@Autowired
+	private PlatformTransactionManager transactionManager;
+
+	@Autowired
+	private EntityManagerFactory entityManagerFactory;
+
+	@PostMapping("/address")
+	public void insertAddress(@RequestBody Address address) {
+	    TransactionDefinition def = new DefaultTransactionDefinition();
+	    TransactionStatus status = transactionManager.getTransaction(def);
+	    try {
+	        EntityManager em = entityManagerFactory.createEntityManager();
+	        em.getTransaction().begin();
+	        em.persist(address);
+	        em.getTransaction().commit();
+	    } catch (Exception e) {
+	        transactionManager.rollback(status);
+	        throw e;
+	    }
+	    transactionManager.commit(status);
+	}
+
 	
 }
