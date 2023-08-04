@@ -44,7 +44,7 @@ import it.bitprojects.store.dto.LoginRequest;
 import it.bitprojects.store.dto.LoginResponse;
 import it.bitprojects.store.dto.MessageDto;
 import it.bitprojects.store.dto.ProductInStockDto;
-import it.bitprojects.store.entities.Address;
+import it.bitprojects.store.entity.Address;
 import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.service.StoreService;
 import it.bitprojects.store.utility.FileService;

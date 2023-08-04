@@ -8,44 +8,57 @@ import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.User.UserBuilder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import it.bitprojects.store.service.UserDetailsManagerImpl;
+import it.bitprojects.store.service.UserDetailsServiceImpl;
+
 @Configuration
+@EnableJpaRepositories("it.bitprojects.store.repository")
 @EnableTransactionManagement // abilita l'utilizzo dell'annotazione @Transactional
 @ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
 		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
 public class AppConfig {
 
+//	@Bean
+//	public UserDetailsManager userDetailsManager() {
+//
+//		// user builder
+//		UserBuilder users = User.builder();
+//
+//		// users
+//		UserDetails user = users.username("user").password("password").roles("USER").build();
+//		UserDetails admin = users.username("admin").password("password").roles("USER", "ADMIN").build();
+//
+//		UserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource());
+//
+//		// users persistence
+//		userDetailsManager.createUser(user);
+//		userDetailsManager.createUser(admin);
+//
+//		return userDetailsManager;
+//	}
+	
 	@Bean
 	public UserDetailsManager userDetailsManager() {
+		
+		return new UserDetailsManagerImpl();
+	}
 
-		// user builder
-		UserBuilder users = User.builder();
+	@Bean
+	public UserDetailsService userDetailsService() {
 
-		// users
-		UserDetails user = users.username("user").password("password").roles("USER").build();
-		UserDetails admin = users.username("admin").password("password").roles("USER", "ADMIN").build();
-
-		UserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource());
-
-		// users persistence
-		userDetailsManager.createUser(user);
-		userDetailsManager.createUser(admin);
-
-		return userDetailsManager;
+		return new UserDetailsServiceImpl();
 	}
 
 	/**
@@ -54,8 +67,10 @@ public class AppConfig {
 	@Bean
 	public DataSource dataSource() {
 		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-				.addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION).addScript("classpath:jdbc/schema.sql")
-				.addScript("classpath:jdbc/test-data.sql").build();
+//				.addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION)
+//				.addScript("classpath:jdbc/schema.sql")
+//				.addScript("classpath:jdbc/test-data.sql")
+				.build();
 	}
 
 	/**
@@ -96,7 +111,7 @@ public class AppConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource());
-		em.setPackagesToScan(new String[] { "it.bitprojects.store.entities" }); // Specifica il package delle tue entità
+		em.setPackagesToScan(new String[] { "it.bitprojects.store.entity" }); // Specifica il package delle tue entità
 		em.setPersistenceProviderClass(HibernatePersistenceProvider.class);
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

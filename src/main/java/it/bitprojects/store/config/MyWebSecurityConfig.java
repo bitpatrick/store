@@ -26,6 +26,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -67,7 +68,7 @@ import lombok.RequiredArgsConstructor;
 public class MyWebSecurityConfig {
 	
 	@Autowired
-	private UserDetailsManager userDetailsManager;
+	private UserDetailsService userDetailsService;
 	
 	/**
 	 * crea utenti in memoria
@@ -78,7 +79,7 @@ public class MyWebSecurityConfig {
 //	public UserDetailsService users() {
 //		
 //		// user builder
-//		UserBuilder users = User.builder();
+//		UserBuilder users = MyCustomUser.builder();
 //		
 //		// users
 //		UserDetails user = users.username("user").password("password").roles("USER").build();
@@ -141,7 +142,7 @@ public class MyWebSecurityConfig {
 	public AuthenticationProvider daoAuthenticationProvider() {
 		
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(userDetailsManager);
+		authProvider.setUserDetailsService(userDetailsService);
 		
 		String encodingId = "bcrypt";
 		Map<String, PasswordEncoder> encoders = new HashMap<>();
@@ -246,7 +247,7 @@ public class MyWebSecurityConfig {
 								
 								try {
 									
-									userDetailsManager.loadUserByUsername(authentication.getName());
+									userDetailsService.loadUserByUsername(authentication.getName());
 									
 								} catch (UsernameNotFoundException e) {
 
@@ -257,7 +258,7 @@ public class MyWebSecurityConfig {
 									UserDetails newUser = users.username(authentication.getName()).build();
 									
 									// save user
-									userDetailsManager.createUser(newUser);
+//									userDetailsService.createUser(newUser);
 								}
 								
 							}
@@ -301,7 +302,7 @@ public class MyWebSecurityConfig {
 					.authenticationEntryPoint(new AuthyEntryPointUnauthorizedJwt())
 					)
 			
-			.addFilterBefore(new AuthTokenFilter(jwtUtils(), userDetailsManager), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new AuthTokenFilter(jwtUtils(), userDetailsService), UsernamePasswordAuthenticationFilter.class)
 			;
 		
 		
@@ -313,7 +314,7 @@ public class MyWebSecurityConfig {
 	RememberMeServices rememberMeServices() {
 		
 		RememberMeTokenAlgorithm encodingAlgorithm = RememberMeTokenAlgorithm.SHA256;
-		TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices("myKey", userDetailsManager, encodingAlgorithm);
+		TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices("myKey", userDetailsService, encodingAlgorithm);
 		rememberMe.setMatchingAlgorithm(RememberMeTokenAlgorithm.MD5);
 		
 		return rememberMe;
