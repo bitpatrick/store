@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -194,7 +195,7 @@ public class MyWebSecurityConfig {
 				
 				(authorize) -> authorize
 						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-						.requestMatchers("/views/**", "/static/**").permitAll()
+						.requestMatchers("/login**", "/views/**", "/static/**").permitAll()
 						.requestMatchers(new RequestMatcher() {
 							
 							@Override
@@ -208,8 +209,7 @@ public class MyWebSecurityConfig {
 							}
 						}).permitAll()
 						.requestMatchers("/home").permitAll()
-						.requestMatchers("/login**").permitAll()
-						.anyRequest().permitAll()
+						.anyRequest().authenticated()
 				)
 		
 				// aggiunge automaticamente il filtro UsernamePasswordAuthenticationFilter
@@ -229,7 +229,8 @@ public class MyWebSecurityConfig {
 							}
 						})
 						.permitAll()
-						)
+						
+					)
 				
 				.oauth2Login(o -> o
 						
@@ -266,7 +267,6 @@ public class MyWebSecurityConfig {
 				
 				.logout((logout) -> 
 				logout.logoutSuccessUrl("/home")
-				.permitAll()
 				)
 				
 				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
