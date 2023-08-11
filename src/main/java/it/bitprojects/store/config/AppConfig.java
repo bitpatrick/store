@@ -23,23 +23,36 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import it.bitprojects.store.repository.JdbcUserDetailsManagerPlus;
+
 @Configuration
 @EnableTransactionManagement // abilita l'utilizzo dell'annotazione @Transactional
 @ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
 		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
 public class AppConfig {
+	
+	@Bean
+	public JdbcUserDetailsManagerPlus jdbcUserDetailsManagerPlus() {
+		
+		return new JdbcUserDetailsManagerPlus(dataSource());
+	}
 
+	/**
+	 * GESTISCE GLI UTENTI REGISTRATI ALL'APPLICAZIONE
+	 */
 	@Bean
 	public UserDetailsManager userDetailsManager() {
 
 		// user builder
 		UserBuilder users = User.builder();
+		
+		
 
 		// users
 		UserDetails user = users.username("user").password("password").roles("USER").build();
 		UserDetails admin = users.username("admin").password("password").roles("USER", "ADMIN").build();
 
-		UserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource());
+		UserDetailsManager userDetailsManager = jdbcUserDetailsManagerPlus();
 
 		// users persistence
 		userDetailsManager.createUser(user);

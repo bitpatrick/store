@@ -11,6 +11,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.BalanceDto;
@@ -22,6 +23,7 @@ import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.model.Product;
+import it.bitprojects.store.repository.JdbcUserDetailsManagerPlus;
 import it.bitprojects.store.repository.Warehouse;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -29,6 +31,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class Maximo implements StoreService {
+	
+	@Autowired
+	private JdbcUserDetailsManagerPlus jdbcUserDetailsManagerPlus;
 
 	@Autowired
 	private Warehouse warehouse;
@@ -73,7 +78,6 @@ public class Maximo implements StoreService {
 				.map(p -> new ProductDto(p.getId(), p.getName(), p.getCategory(), p.getPrice())).toList();
 	}
 
-	// TODO A
 	@Override
 	public List<ProductInStockDto> getProductsInStock() {
 		return warehouse.getProductsInStock();
@@ -134,6 +138,14 @@ public class Maximo implements StoreService {
 		
 
 		return null;
+	}
+
+	@Override
+	public List<UserDetails> getAllUsers() {
+
+		List<UserDetails> users = this.jdbcUserDetailsManagerPlus.getAllUsers();
+		
+		return users;
 	}
 
 }

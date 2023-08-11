@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import it.bitprojects.store.dto.BalanceDto;
 import it.bitprojects.store.dto.ProductDto;
@@ -32,5 +33,7 @@ public interface StoreService {
 	public void saveFile(String fileName);
 
 	public BalanceDto incrementBalance(Currency currencyEnum, Integer quantity);
+	
+	public List<UserDetails> getAllUsers();
 
 }

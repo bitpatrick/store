@@ -10,7 +10,6 @@ public class MyCustomPasswordEncoder extends DelegatingPasswordEncoder {
 
 	public MyCustomPasswordEncoder(String idForEncode, Map<String, PasswordEncoder> idToPasswordEncoder) {
 		super(idForEncode, idToPasswordEncoder);
-		// TODO Auto-generated constructor stub
 	}
 	
 	
@@ -18,7 +17,6 @@ public class MyCustomPasswordEncoder extends DelegatingPasswordEncoder {
 	public MyCustomPasswordEncoder(String idForEncode, Map<String, PasswordEncoder> idToPasswordEncoder,
 			String idPrefix, String idSuffix) {
 		super(idForEncode, idToPasswordEncoder, idPrefix, idSuffix);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override

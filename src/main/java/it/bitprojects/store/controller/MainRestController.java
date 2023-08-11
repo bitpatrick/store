@@ -299,6 +299,17 @@ public class MainRestController implements ServletContextAware {
 	    }
 	    transactionManager.commit(status);
 	}
+	
+	@GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<UserDetails>> getUsers() {
+		
+		List<UserDetails> users = this.storeService.getAllUsers();
+		
+		return new ResponseEntity<List<UserDetails>>(users, HttpStatus.OK);
+		
+	}
+	
+	// TODO fare un ENDPOINT dove recupero un utente registrato all'app tramite il nome che il client passa
 
 	
 }
