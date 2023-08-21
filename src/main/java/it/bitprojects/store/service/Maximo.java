@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.BalanceDto;
@@ -19,11 +19,13 @@ import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.Purchase;
+import it.bitprojects.store.dto.UserDTO;
+import it.bitprojects.store.exceptions.UserNotFoundException;
 import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.model.Product;
-import it.bitprojects.store.repository.JdbcUserDetailsManagerPlus;
+import it.bitprojects.store.repository.UserRepository;
 import it.bitprojects.store.repository.Warehouse;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -31,9 +33,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class Maximo implements StoreService {
-	
+
 	@Autowired
-	private JdbcUserDetailsManagerPlus jdbcUserDetailsManagerPlus;
+	private UserRepository userRepository;
 
 	@Autowired
 	private Warehouse warehouse;
@@ -128,24 +130,31 @@ public class Maximo implements StoreService {
 
 		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 		String username = userDetails.getUsername();
-		
-		
+
 		Balance balance = warehouse.getBalance(username);
-		
-		balance.increment(currencyEnum,quantity);
-		
+
+		balance.increment(currencyEnum, quantity);
+
 //		warehouse.updateQty(username,);
-		
 
 		return null;
 	}
 
 	@Override
-	public List<UserDetails> getAllUsers() {
+	public List<UserDTO> getAllUsers() {
 
-		List<UserDetails> users = this.jdbcUserDetailsManagerPlus.getAllUsers();
-		
+		List<UserDTO> users = this.userRepository.getAllUsers();
+
 		return users;
+	}
+
+	@Override
+	public UserDTO getUser(String username) {
+		Optional<UserDTO> user = userRepository.findUserByUsername(username);
+		if (user.isEmpty()) {
+			throw new UserNotFoundException("User "+username+" not found");
+		}
+		return user.get();
 	}
 
 }

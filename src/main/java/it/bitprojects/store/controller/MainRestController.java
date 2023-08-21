@@ -44,6 +44,7 @@ import it.bitprojects.store.dto.LoginRequest;
 import it.bitprojects.store.dto.LoginResponse;
 import it.bitprojects.store.dto.MessageDto;
 import it.bitprojects.store.dto.ProductInStockDto;
+import it.bitprojects.store.dto.UserDTO;
 import it.bitprojects.store.entities.Address;
 import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.service.StoreService;
@@ -286,30 +287,39 @@ public class MainRestController implements ServletContextAware {
 
 	@PostMapping("/address")
 	public void insertAddress(@RequestBody Address address) {
-	    TransactionDefinition def = new DefaultTransactionDefinition();
-	    TransactionStatus status = transactionManager.getTransaction(def);
-	    try {
-	        EntityManager em = entityManagerFactory.createEntityManager();
-	        em.getTransaction().begin();
-	        em.persist(address);
-	        em.getTransaction().commit();
-	    } catch (Exception e) {
-	        transactionManager.rollback(status);
-	        throw e;
-	    }
-	    transactionManager.commit(status);
+		TransactionDefinition def = new DefaultTransactionDefinition();
+		TransactionStatus status = transactionManager.getTransaction(def);
+		try {
+			EntityManager em = entityManagerFactory.createEntityManager();
+			em.getTransaction().begin();
+			em.persist(address);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			transactionManager.rollback(status);
+			throw e;
+		}
+		transactionManager.commit(status);
 	}
-	
-	@GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<UserDetails>> getUsers() {
-		
-		List<UserDetails> users = this.storeService.getAllUsers();
-		
-		return new ResponseEntity<List<UserDetails>>(users, HttpStatus.OK);
-		
-	}
-	
-	// TODO fare un ENDPOINT dove recupero un utente registrato all'app tramite il nome che il client passa
 
-	
+	@GetMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<UserDTO>> getUsers() {
+
+		List<UserDTO> users = this.storeService.getAllUsers();
+
+		return new ResponseEntity<List<UserDTO>>(users, HttpStatus.OK);
+
+	}
+
+	// TODO fare un ENDPOINT dove recupero un utente registrato all'app tramite il
+	// nome che il client passa
+
+	@GetMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UserDTO> getUserByUsername(@RequestParam String username) {
+
+		UserDTO user = this.storeService.getUser(username);
+
+		return new ResponseEntity<UserDTO>(user, HttpStatus.OK);
+
+	}
+
 }
