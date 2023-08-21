@@ -23,7 +23,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import it.bitprojects.store.repository.JdbcUserDetailsManagerPlus;
+import it.bitprojects.store.repository.UserRepository;
 
 @Configuration
 @EnableTransactionManagement // abilita l'utilizzo dell'annotazione @Transactional
@@ -32,9 +32,9 @@ import it.bitprojects.store.repository.JdbcUserDetailsManagerPlus;
 public class AppConfig {
 	
 	@Bean
-	public JdbcUserDetailsManagerPlus jdbcUserDetailsManagerPlus() {
+	public UserRepository jdbcUserDetailsManagerPlus() {
 		
-		return new JdbcUserDetailsManagerPlus(dataSource());
+		return new UserRepository(dataSource());
 	}
 
 	/**
