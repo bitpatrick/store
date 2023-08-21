@@ -21,12 +21,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.User.UserBuilder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,8 +61,14 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 public class MyWebSecurityConfig {
 	
-	@Autowired
+S	@Autowired
 	private UserDetailsManager userDetailsManager;
+	
+	@Autowired
+	private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+
+	@Autowired
+	private ClientRegistrationRepository clientRegistrationRepository;
 	
 	/**
 	 * crea utenti in memoria
@@ -106,20 +107,18 @@ public class MyWebSecurityConfig {
 	 */
 	@Bean
 	public OAuth2AuthorizedClientService authorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
-		
 		return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
 	}
 
 	/**
 	 * ClientRegistrationRepository è utilizzato per memorizzare i dettagli di
-	 * registrazione del client
+	 * registrazione del client, ovvero, dell'app 
 	 * 
 	 * @param authorizedClientService
 	 * @return OAuth2AuthorizedClientRepository
 	 */
 	@Bean
 	public OAuth2AuthorizedClientRepository authorizedClientRepository(OAuth2AuthorizedClientService authorizedClientService) {
-		
 		return new AuthenticatedPrincipalOAuth2AuthorizedClientRepository(authorizedClientService);
 	}
 
@@ -175,12 +174,11 @@ public class MyWebSecurityConfig {
 		providers.add(new OAuth2LoginAuthenticationProvider(new DefaultAuthorizationCodeTokenResponseClient(), new DefaultOAuth2UserService()));
 		return new ProviderManager(providers);
 	}
-
-	@Autowired
-	private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-
-	@Autowired
-	private ClientRegistrationRepository clientRegistrationRepository;
+	
+	@Bean
+	public AuthenticationSuccessHandler oAuthAuthenticationSuccessHandler() {
+		return new OAuthAuthenticationSuccessHandler(userDetailsManager);
+	}
 
 	@Order(Ordered.LOWEST_PRECEDENCE)
 	@Bean
@@ -231,38 +229,19 @@ public class MyWebSecurityConfig {
 						
 					)
 				
+				
+				
+				
 				.oauth2Login(o -> o
 						
-						.loginProcessingUrl("/login/oauth2")
-						.clientRegistrationRepository(clientRegistrationRepository)
-						.authorizedClientService(oAuth2AuthorizedClientService)
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
-						.successHandler(new AuthenticationSuccessHandler() {
-							
-							@Override
-							public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-									Authentication authentication) throws IOException, ServletException {
-								
-								try {
-									
-									userDetailsManager.loadUserByUsername(authentication.getName());
-									
-								} catch (UsernameNotFoundException e) {
-
-									// user builder
-									UserBuilder users = User.builder();
-									
-									// create user
-									UserDetails newUser = users.username(authentication.getName()).build();
-									
-									// save user
-									userDetailsManager.createUser(newUser);
-								}
-								
-							}
-						})
-				)
+						.loginProcessingUrl("/login/oauth2") // che path deve avere la request per essere gestita dal filtro ?
+						.clientRegistrationRepository(clientRegistrationRepository) // dove sono i client registrati ( le app ) 
+						.authorizedClientService(oAuth2AuthorizedClientService) // recupera le APP che sono autorizzate da github
+						.loginPage("/login") // imposto la pagina di login
+						.defaultSuccessUrl("/home") // imposta la pagina dove vengo reindirizzato se il login è avvenuto con successo
+						.successHandler(oAuthAuthenticationSuccessHandler())
+				
+						)
 				
 				.logout((logout) -> 
 				logout.logoutSuccessUrl("/home")
@@ -271,7 +250,7 @@ public class MyWebSecurityConfig {
 				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
 				
 				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-																		// frame, che sono necessarie per l'H2-console.
+				// frame, che sono necessarie per l'H2-console.
 
 		return http.build();
 	}
