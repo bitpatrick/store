@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,6 +47,10 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import jakarta.servlet.DispatcherType;
@@ -61,7 +66,7 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 public class MyWebSecurityConfig {
 	
-S	@Autowired
+	@Autowired
 	private UserDetailsManager userDetailsManager;
 	
 	@Autowired
@@ -176,8 +181,13 @@ S	@Autowired
 	}
 	
 	@Bean
+	public SecurityContextRepository httpSecurityContext() {
+		return new HttpSessionSecurityContextRepository();
+	}
+	
+	@Bean
 	public AuthenticationSuccessHandler oAuthAuthenticationSuccessHandler() {
-		return new OAuthAuthenticationSuccessHandler(userDetailsManager);
+		return new OAuthAuthenticationSuccessHandler(userDetailsManager, httpSecurityContext());
 	}
 
 	@Order(Ordered.LOWEST_PRECEDENCE)
@@ -187,7 +197,14 @@ S	@Autowired
 		http	
 		.authenticationManager(providerManager())
 		.csrf(csrf -> csrf.disable())
+		.requestCache(rc -> rc.disable())
 		.securityMatcher("/**")
+		.securityContext(sc -> sc
+				.requireExplicitSave(true)
+				.securityContextRepository(
+						httpSecurityContext()
+					)
+		)
 		.authorizeHttpRequests(
 				
 				(authorize) -> authorize
@@ -211,9 +228,7 @@ S	@Autowired
 		
 				// aggiunge automaticamente il filtro UsernamePasswordAuthenticationFilter
 				.formLogin(
-						
 						form -> 
-						
 						form
 						.loginPage("/login")
 						.defaultSuccessUrl("/home")
@@ -226,11 +241,7 @@ S	@Autowired
 							}
 						})
 						.permitAll()
-						
 					)
-				
-				
-				
 				
 				.oauth2Login(o -> o
 						
@@ -238,19 +249,16 @@ S	@Autowired
 						.clientRegistrationRepository(clientRegistrationRepository) // dove sono i client registrati ( le app ) 
 						.authorizedClientService(oAuth2AuthorizedClientService) // recupera le APP che sono autorizzate da github
 						.loginPage("/login") // imposto la pagina di login
-						.defaultSuccessUrl("/home") // imposta la pagina dove vengo reindirizzato se il login è avvenuto con successo
 						.successHandler(oAuthAuthenticationSuccessHandler())
-				
+//						.defaultSuccessUrl("/home") // va in conflitto con oAuthAuthenticationSuccessHandler
+						
 						)
 				
 				.logout((logout) -> 
 				logout.logoutSuccessUrl("/home")
 				)
-				
 				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
-				// frame, che sono necessarie per l'H2-console.
+				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i frame, che sono necessarie per l'H2-console.
 
 		return http.build();
 	}

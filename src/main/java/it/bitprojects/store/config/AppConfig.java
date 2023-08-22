@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -32,8 +31,7 @@ import it.bitprojects.store.repository.UserRepository;
 public class AppConfig {
 	
 	@Bean
-	public UserRepository jdbcUserDetailsManagerPlus() {
-		
+	public UserRepository userRepository() {
 		return new UserRepository(dataSource());
 	}
 
@@ -44,15 +42,13 @@ public class AppConfig {
 	public UserDetailsManager userDetailsManager() {
 
 		// user builder
-		UserBuilder users = User.builder();
-		
-		
+		UserBuilder userBuilder = User.builder();
 
 		// users
-		UserDetails user = users.username("user").password("password").roles("USER").build();
-		UserDetails admin = users.username("admin").password("password").roles("USER", "ADMIN").build();
+		UserDetails user = userBuilder.username("user").password("password").roles("USER").build();
+		UserDetails admin = userBuilder.username("admin").password("password").roles("USER", "ADMIN").build();
 
-		UserDetailsManager userDetailsManager = jdbcUserDetailsManagerPlus();
+		UserDetailsManager userDetailsManager = userRepository();
 
 		// users persistence
 		userDetailsManager.createUser(user);
