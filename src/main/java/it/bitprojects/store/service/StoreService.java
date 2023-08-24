@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.core.io.Resource;
 
 import it.bitprojects.store.dto.BalanceDto;
+import it.bitprojects.store.dto.ProductDetail;
 import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.Purchase;
@@ -37,5 +38,7 @@ public interface StoreService {
 	public List<UserDTO> getAllUsers();
 
 	public UserDTO getUser(String username);
+
+	public ProductDetail getProductDetail(Integer id);
 
 }

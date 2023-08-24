@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import it.bitprojects.store.dto.BalanceDto;
+import it.bitprojects.store.dto.ProductDetail;
 import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStock;
 import it.bitprojects.store.dto.ProductInStockDto;
@@ -25,6 +26,7 @@ import it.bitprojects.store.model.Balance;
 import it.bitprojects.store.model.Cart;
 import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.model.Product;
+import it.bitprojects.store.repository.ProductRepository;
 import it.bitprojects.store.repository.UserRepository;
 import it.bitprojects.store.repository.Warehouse;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -39,6 +41,8 @@ public class Maximo implements StoreService {
 
 	@Autowired
 	private Warehouse warehouse;
+	@Autowired
+	private ProductRepository productRepository;
 
 	@Autowired
 	private Report report;
@@ -77,7 +81,7 @@ public class Maximo implements StoreService {
 	@Override
 	public List<ProductDto> getAllProducts() {
 		return warehouse.getAll(Product.class).stream()
-				.map(p -> new ProductDto(p.getId(), p.getName(), p.getCategory(), p.getPrice())).toList();
+				.map(p -> new ProductDto(p.getId_product(), p.getName(), p.getCategory(), p.getPrice())).toList();
 	}
 
 	@Override
@@ -149,10 +153,19 @@ public class Maximo implements StoreService {
 	}
 
 	@Override
+	public ProductDetail getProductDetail(Integer id) {
+
+		Product product = this.productRepository.getById(id);
+
+		return new ProductDetail(product.getName(), product.getCategory(), product.getPrice(),
+				product.getDescription());
+	}
+
+	@Override
 	public UserDTO getUser(String username) {
 		Optional<UserDTO> user = userRepository.findUserByUsername(username);
 		if (user.isEmpty()) {
-			throw new UserNotFoundException("User "+username+" not found");
+			throw new UserNotFoundException("User " + username + " not found");
 		}
 		return user.get();
 	}

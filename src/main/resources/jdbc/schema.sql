@@ -4,17 +4,18 @@ CREATE TABLE images (
 );
 
 CREATE TABLE products (
-    id INT AUTO_INCREMENT,
+    id_product INT AUTO_INCREMENT,
     name VARCHAR(255),
     category VARCHAR(255),
     price DECIMAL(10,2),
-    PRIMARY KEY(id)
+    description VARCHAR(255),
+    PRIMARY KEY(id_product)
 );
 
 CREATE TABLE stocks (
     id_product INT PRIMARY KEY,
     qty INT,
-    FOREIGN KEY(id_product) REFERENCES products(id)
+    FOREIGN KEY(id_product) REFERENCES products(id_product)
 );
 
 CREATE TABLE regulations ( 
@@ -43,7 +44,7 @@ CREATE TABLE orders_products (
     order_id INT,
     product_id INT,
     FOREIGN KEY(order_id) REFERENCES orders(id),
-    FOREIGN KEY(product_id) REFERENCES products(id),
+    FOREIGN KEY(product_id) REFERENCES products(id_product),
     PRIMARY KEY(order_id, product_id)
 );
 /*

@@ -1,10 +1,10 @@
 INSERT INTO users (username, password, enabled) VALUES ('supermario', '{bcrypt}$2a$12$jAYTU4q6a7Os45R9oOlknuXloS0ElcOLHvyCvlDXUERCwvEl2JA8O', true);
 INSERT INTO authorities (username, authority) VALUES ('supermario', 'ROLE_USER'); 
 
-INSERT INTO products (name, category, price) VALUES ('iphone', 'TELEPHONY', 10.99);
-INSERT INTO products (name, category, price) VALUES ('lg-tv', 'TV', 15.99);
-INSERT INTO products (name, category, price) VALUES ('folletto', 'HOUSEHOLD_APPLIANCE', 20.99);
-INSERT INTO products (name, category, price) VALUES ('samsung-s9', 'TELEPHONY', 39.99);
+INSERT INTO products (name, category, price, description) VALUES ('iphone', 'TELEPHONY', 10.99, 'descrizione ios');
+INSERT INTO products (name, category, price, description) VALUES ('lg-tv', 'TV', 15.99, 'descrizione tv');
+INSERT INTO products (name, category, price, description) VALUES ('folletto', 'HOUSEHOLD_APPLIANCE', 20.99, 'descrizione folletto');
+INSERT INTO products (name, category, price, description) VALUES ('samsung-s9', 'TELEPHONY', 39.99, 'descrizione telefono android');
 
 INSERT INTO stocks (id_product, qty) VALUES (1, 5);
 INSERT INTO stocks (id_product, qty) VALUES (2, 7);

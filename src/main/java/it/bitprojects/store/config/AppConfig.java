@@ -8,6 +8,7 @@ import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -25,11 +26,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import it.bitprojects.store.repository.UserRepository;
 
 @Configuration
+@EnableJpaRepositories(basePackages = "it.bitprojects.store.repository")
 @EnableTransactionManagement // abilita l'utilizzo dell'annotazione @Transactional
 @ComponentScan(basePackages = { "it.bitprojects.store.model", "it.bitprojects.store.repository",
 		"it.bitprojects.store.service", "it.bitprojects.store.listener" })
 public class AppConfig {
-	
+
 	@Bean
 	public UserRepository userRepository() {
 		return new UserRepository(dataSource());
@@ -97,7 +99,6 @@ public class AppConfig {
 	public PlatformTransactionManager transactionManager(DataSource dataSource) {
 
 		JpaTransactionManager jtm = new JpaTransactionManager(entityManagerFactory().getObject());
-
 		return jtm;
 	}
 
@@ -105,14 +106,19 @@ public class AppConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource());
-		em.setPackagesToScan(new String[] { "it.bitprojects.store.entities" }); // Specifica il package delle tue entità
+		em.setPackagesToScan(new String[] { "it.bitprojects.store.entities", "it.bitprojects.store.model" }); // Specifica
+																												// il
+																												// package
+																												// delle
+																												// tue
+																												// entità
 		em.setPersistenceProviderClass(HibernatePersistenceProvider.class);
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 //		 em.setJpaProperties(additionalProperties());
 		Properties properties = new Properties();
-		properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+		properties.setProperty("hibernate.hbm2ddl.auto", "validate");
 
 		em.setJpaProperties(properties);
 

@@ -25,9 +25,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,16 +40,15 @@ import it.bitprojects.store.dto.BalanceDto;
 import it.bitprojects.store.dto.LoginRequest;
 import it.bitprojects.store.dto.LoginResponse;
 import it.bitprojects.store.dto.MessageDto;
-import it.bitprojects.store.dto.ProductDto;
+import it.bitprojects.store.dto.ProductDetail;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.UserDTO;
-import it.bitprojects.store.entities.Address;
 import it.bitprojects.store.model.Currency;
 import it.bitprojects.store.service.StoreService;
 import it.bitprojects.store.utility.FileService;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.ServletContext;
+import jakarta.transaction.Transactional;
 import net.sf.jasperreports.engine.JRException;
 
 @RestController
@@ -286,21 +282,21 @@ public class MainRestController implements ServletContextAware {
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;
 
-	@PostMapping("/address")
-	public void insertAddress(@RequestBody Address address) {
-		TransactionDefinition def = new DefaultTransactionDefinition();
-		TransactionStatus status = transactionManager.getTransaction(def);
-		try {
-			EntityManager em = entityManagerFactory.createEntityManager();
-			em.getTransaction().begin();
-			em.persist(address);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			transactionManager.rollback(status);
-			throw e;
-		}
-		transactionManager.commit(status);
-	}
+//	@PostMapping("/address")
+//	public void insertAddress(@RequestBody Address address) {
+//		TransactionDefinition def = new DefaultTransactionDefinition();
+//		TransactionStatus status = transactionManager.getTransaction(def);
+//		try {
+//			EntityManager em = entityManagerFactory.createEntityManager();
+//			em.getTransaction().begin();
+//			em.persist(address);
+//			em.getTransaction().commit();
+//		} catch (Exception e) {
+//			transactionManager.rollback(status);
+//			throw e;
+//		}
+//		transactionManager.commit(status);
+//	}
 
 	@GetMapping(value = "/users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<UserDTO>> getUsers() {
@@ -322,28 +318,12 @@ public class MainRestController implements ServletContextAware {
 		return new ResponseEntity<UserDTO>(user, HttpStatus.OK);
 
 	}
+	@Transactional
+	@GetMapping(value = "/products/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ProductDetail> getProductDetail(@PathVariable Integer id) {
+		ProductDetail productDetail = this.storeService.getProductDetail(id);
 
-	@GetMapping(value = "/product-info")
-	public ResponseEntity<ProductDto> getProduct(@RequestParam Integer id) {
-		ProductDto productDto = null;
-		TransactionDefinition def = new DefaultTransactionDefinition();
-		TransactionStatus status = transactionManager.getTransaction(def);
-		try {
-			EntityManager em = entityManagerFactory.createEntityManager();
-			em.getTransaction().begin();
-
-			
-			
-			
-			
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			transactionManager.rollback(status);
-			throw e;
-		}
-		transactionManager.commit(status);
-
-		return new ResponseEntity<ProductDto>(productDto, HttpStatus.OK);
+		return new ResponseEntity<ProductDetail>(productDetail, HttpStatus.OK);
 
 	}
 
