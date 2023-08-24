@@ -43,6 +43,7 @@ import it.bitprojects.store.dto.BalanceDto;
 import it.bitprojects.store.dto.LoginRequest;
 import it.bitprojects.store.dto.LoginResponse;
 import it.bitprojects.store.dto.MessageDto;
+import it.bitprojects.store.dto.ProductDto;
 import it.bitprojects.store.dto.ProductInStockDto;
 import it.bitprojects.store.dto.UserDTO;
 import it.bitprojects.store.entities.Address;
@@ -319,6 +320,30 @@ public class MainRestController implements ServletContextAware {
 		UserDTO user = this.storeService.getUser(username);
 
 		return new ResponseEntity<UserDTO>(user, HttpStatus.OK);
+
+	}
+
+	@GetMapping(value = "/product-info")
+	public ResponseEntity<ProductDto> getProduct(@RequestParam Integer id) {
+		ProductDto productDto = null;
+		TransactionDefinition def = new DefaultTransactionDefinition();
+		TransactionStatus status = transactionManager.getTransaction(def);
+		try {
+			EntityManager em = entityManagerFactory.createEntityManager();
+			em.getTransaction().begin();
+
+			
+			
+			
+			
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			transactionManager.rollback(status);
+			throw e;
+		}
+		transactionManager.commit(status);
+
+		return new ResponseEntity<ProductDto>(productDto, HttpStatus.OK);
 
 	}
 

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -22,7 +23,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,9 +47,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
-import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -65,16 +63,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class MyWebSecurityConfig {
-	
+
 	@Autowired
+	@Qualifier("userRepository")
+
 	private UserDetailsManager userDetailsManager;
-	
+
 	@Autowired
 	private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
 	@Autowired
 	private ClientRegistrationRepository clientRegistrationRepository;
-	
+
 	/**
 	 * crea utenti in memoria
 	 * 
@@ -111,29 +111,29 @@ public class MyWebSecurityConfig {
 	 * @return OAuth2AuthorizedClientService
 	 */
 	@Bean
-	public OAuth2AuthorizedClientService authorizedClientService(ClientRegistrationRepository clientRegistrationRepository) {
+	public OAuth2AuthorizedClientService authorizedClientService(
+			ClientRegistrationRepository clientRegistrationRepository) {
 		return new InMemoryOAuth2AuthorizedClientService(clientRegistrationRepository);
 	}
 
 	/**
 	 * ClientRegistrationRepository è utilizzato per memorizzare i dettagli di
-	 * registrazione del client, ovvero, dell'app 
+	 * registrazione del client, ovvero, dell'app
 	 * 
 	 * @param authorizedClientService
 	 * @return OAuth2AuthorizedClientRepository
 	 */
 	@Bean
-	public OAuth2AuthorizedClientRepository authorizedClientRepository(OAuth2AuthorizedClientService authorizedClientService) {
+	public OAuth2AuthorizedClientRepository authorizedClientRepository(
+			OAuth2AuthorizedClientService authorizedClientService) {
 		return new AuthenticatedPrincipalOAuth2AuthorizedClientRepository(authorizedClientService);
 	}
 
 	private ClientRegistration githubClientRegistration() {
-		
-		return CommonOAuth2Provider.GITHUB.getBuilder("github")
-				.clientId("727109d7f1ebfe825d11")
+
+		return CommonOAuth2Provider.GITHUB.getBuilder("github").clientId("727109d7f1ebfe825d11")
 				.clientSecret("458fbf6505ecc362368eca8ec7e8639eef52ce3b")
-				.redirectUri("http://localhost:8080/store/login/oauth2")
-				.build();
+				.redirectUri("http://localhost:8080/store/login/oauth2").build();
 	}
 
 	@Bean
@@ -143,10 +143,10 @@ public class MyWebSecurityConfig {
 
 	@Bean
 	public AuthenticationProvider daoAuthenticationProvider() {
-		
+
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(userDetailsManager);
-		
+
 		String encodingId = "bcrypt";
 		Map<String, PasswordEncoder> encoders = new HashMap<>();
 		encoders.put(encodingId, new BCryptPasswordEncoder());
@@ -164,11 +164,11 @@ public class MyWebSecurityConfig {
 		encoders.put("sha256", new org.springframework.security.crypto.password.StandardPasswordEncoder());
 		encoders.put("argon2", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_2());
 		encoders.put("argon2@SpringSecurity_v5_8", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
-		
+
 		MyCustomPasswordEncoder myCustomPasswordEncoder = new MyCustomPasswordEncoder(encodingId, encoders);
-		
+
 		authProvider.setPasswordEncoder(myCustomPasswordEncoder);
-		
+
 		return authProvider;
 	}
 
@@ -176,15 +176,16 @@ public class MyWebSecurityConfig {
 	public AuthenticationManager providerManager() {
 		List<AuthenticationProvider> providers = new ArrayList<>();
 		providers.add(daoAuthenticationProvider());
-		providers.add(new OAuth2LoginAuthenticationProvider(new DefaultAuthorizationCodeTokenResponseClient(), new DefaultOAuth2UserService()));
+		providers.add(new OAuth2LoginAuthenticationProvider(new DefaultAuthorizationCodeTokenResponseClient(),
+				new DefaultOAuth2UserService()));
 		return new ProviderManager(providers);
 	}
-	
+
 	@Bean
 	public SecurityContextRepository httpSecurityContext() {
 		return new HttpSessionSecurityContextRepository();
 	}
-	
+
 	@Bean
 	public AuthenticationSuccessHandler oAuthAuthenticationSuccessHandler() {
 		return new OAuthAuthenticationSuccessHandler(userDetailsManager, httpSecurityContext());
@@ -193,115 +194,94 @@ public class MyWebSecurityConfig {
 	@Order(Ordered.LOWEST_PRECEDENCE)
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		
-		http	
-		.authenticationManager(providerManager())
-		.csrf(csrf -> csrf.disable())
-		.requestCache(rc -> rc.disable())
-		.securityMatcher("/**")
-		.securityContext(sc -> sc
-				.requireExplicitSave(true)
-				.securityContextRepository(
-						httpSecurityContext()
-					)
-		)
-		.authorizeHttpRequests(
-				
-				(authorize) -> authorize
-						.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-						.requestMatchers("/login**", "/views/**", "/static/**").permitAll()
-						.requestMatchers(new RequestMatcher() {
-							
-							@Override
-							public boolean matches(HttpServletRequest request) {
-								
-								 if ( request.getServletPath().contains("console") ) {
-									 return true;
-								 }
-								 
-								return false;
-							}
-						}).permitAll()
-						.requestMatchers("/home").permitAll()
-						.anyRequest().authenticated()
-				)
-		
+
+		http.authenticationManager(providerManager()).csrf(csrf -> csrf.disable()).requestCache(rc -> rc.disable())
+				.securityMatcher("/**")
+				.securityContext(sc -> sc.requireExplicitSave(true).securityContextRepository(httpSecurityContext()))
+				.authorizeHttpRequests(
+
+						(authorize) -> authorize
+								.dispatcherTypeMatchers(DispatcherType.INCLUDE, DispatcherType.FORWARD,
+										DispatcherType.ERROR)
+								.permitAll().requestMatchers("/login**", "/views/**", "/static/**").permitAll()
+								.requestMatchers(new RequestMatcher() {
+
+									@Override
+									public boolean matches(HttpServletRequest request) {
+
+										if (request.getServletPath().contains("console")) {
+											return true;
+										}
+
+										return false;
+									}
+								}).permitAll().requestMatchers("/home").permitAll().anyRequest().authenticated())
+
 				// aggiunge automaticamente il filtro UsernamePasswordAuthenticationFilter
-				.formLogin(
-						form -> 
-						form
-						.loginPage("/login")
-						.defaultSuccessUrl("/home")
+				.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/home")
 //						.failureUrl("/login?error=credenziali%20non%20corrette")
 						.failureHandler(new AuthenticationFailureHandler() {
-							
+
 							@Override
-							public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-								response.sendRedirect("/store/login?error="+exception.getMessage());
+							public void onAuthenticationFailure(HttpServletRequest request,
+									HttpServletResponse response, AuthenticationException exception)
+									throws IOException, ServletException {
+								response.sendRedirect("/store/login?error=" + exception.getMessage());
 							}
-						})
-						.permitAll()
-					)
-				
+						}).permitAll())
+
 				.oauth2Login(o -> o
-						
-						.loginProcessingUrl("/login/oauth2") // che path deve avere la request per essere gestita dal filtro ?
-						.clientRegistrationRepository(clientRegistrationRepository) // dove sono i client registrati ( le app ) 
-						.authorizedClientService(oAuth2AuthorizedClientService) // recupera le APP che sono autorizzate da github
+
+						.loginProcessingUrl("/login/oauth2") // che path deve avere la request per essere gestita dal
+																// filtro ?
+						.clientRegistrationRepository(clientRegistrationRepository) // dove sono i client registrati (
+																					// le app )
+						.authorizedClientService(oAuth2AuthorizedClientService) // recupera le APP che sono autorizzate
+																				// da github
 						.loginPage("/login") // imposto la pagina di login
 						.successHandler(oAuthAuthenticationSuccessHandler())
 //						.defaultSuccessUrl("/home") // va in conflitto con oAuthAuthenticationSuccessHandler
-						
-						)
-				
-				.logout((logout) -> 
-				logout.logoutSuccessUrl("/home")
+
 				)
+
+				.logout((logout) -> logout.logoutSuccessUrl("/home"))
 				.rememberMe(r -> r.rememberMeServices(rememberMeServices()))
-				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i frame, che sono necessarie per l'H2-console.
+				.headers(headers -> headers.frameOptions().disable()); // disabilitare le opzioni di sicurezza per i
+																		// frame, che sono necessarie per l'H2-console.
 
 		return http.build();
 	}
-	
+
 	@Bean
 	public JwtUtils jwtUtils() {
 		return new JwtUtils();
 	}
-	
+
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-		
-		http
-			.cors(cors -> cors.disable())
-			.csrf(csrf -> csrf.disable())
-			.securityMatcher("/api/**")
-			.authorizeHttpRequests(r -> r
-					.requestMatchers("/api/login**").permitAll()
-					.anyRequest().authenticated()
-					)
-			.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-					
-					)
-			.exceptionHandling(e -> e
-					.authenticationEntryPoint(new AuthyEntryPointUnauthorizedJwt())
-					)
-			
-			.addFilterBefore(new AuthTokenFilter(jwtUtils(), userDetailsManager), UsernamePasswordAuthenticationFilter.class)
-			;
-		
-		
+
+		http.cors(cors -> cors.disable()).csrf(csrf -> csrf.disable()).securityMatcher("/api/**")
+				.authorizeHttpRequests(r -> r.requestMatchers("/api/login**").permitAll().anyRequest().authenticated())
+				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+				).exceptionHandling(e -> e.authenticationEntryPoint(new AuthyEntryPointUnauthorizedJwt()))
+
+				.addFilterBefore(new AuthTokenFilter(jwtUtils(), userDetailsManager),
+						UsernamePasswordAuthenticationFilter.class);
+
 		return http.build();
-		
+
 	}
-	
+
 	@Bean
 	RememberMeServices rememberMeServices() {
-		
+
 		RememberMeTokenAlgorithm encodingAlgorithm = RememberMeTokenAlgorithm.SHA256;
-		TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices("myKey", userDetailsManager, encodingAlgorithm);
+		TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices("myKey", userDetailsManager,
+				encodingAlgorithm);
 		rememberMe.setMatchingAlgorithm(RememberMeTokenAlgorithm.MD5);
-		
+
 		return rememberMe;
 	}
 
