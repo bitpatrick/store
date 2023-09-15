@@ -24,21 +24,28 @@ import lombok.AllArgsConstructor;
 public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	private UserDetailsManager userDetailsManager;
-	
+
 	private SecurityContextRepository securityContextRepository;
-	
+
 	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws IOException, ServletException {
 
 		String name = null;
+
+		String uri = request.getRequestURI();
+
+		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = null;
 
 		try {
 
 			DefaultOAuth2User defaultOAuth2User = (DefaultOAuth2User) authentication.getPrincipal();
-			
+
 			name = defaultOAuth2User.getAttribute("login");
 
-			userDetailsManager.loadUserByUsername(name);
+			UserDetails userDetails = userDetailsManager.loadUserByUsername(name);
+
+			usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, null);
 
 		} catch (UsernameNotFoundException e) {
 
@@ -50,20 +57,20 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
 
 			// users persistence
 			userDetailsManager.createUser(newUser);
-			
+
 			// create token user
-			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(newUser, null, null);
-			
-			// set security context
-			SecurityContext securityContext = SecurityContextHolder.getContext();
-			securityContext.setAuthentication(usernamePasswordAuthenticationToken);
-			SecurityContextHolder.setContext(securityContext);
-			securityContextRepository.saveContext(securityContext, request, response);
-			
-			// redirect
-			response.sendRedirect("/store/home");
-			
+			usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(newUser, null, null);
+
 		}
+
+		// set security context
+		SecurityContext securityContext = SecurityContextHolder.getContext();
+		securityContext.setAuthentication(usernamePasswordAuthenticationToken);
+		SecurityContextHolder.setContext(securityContext);
+		securityContextRepository.saveContext(securityContext, request, response);
+
+		// redirect
+		response.sendRedirect("/store/home");
 
 	}
 
